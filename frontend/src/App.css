@@ -1,0 +1,102 @@
+/* =========================================================
+   TAX MANAGEMENT SYSTEM
+   Application-level styles
+   ========================================================= */
+
+/* Page content helper */
+.page-container {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.dashboard-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* =========================================================
+   FORM HELPERS
+   ========================================================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   PAGE TITLES
+   ========================================================= */
+
+.page-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.page-description {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.loading-container {
+  display: flex;
+  min-height: 16rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

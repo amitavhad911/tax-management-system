@@ -1,0 +1,53 @@
+# ==============================
+# React / Vite
+# ==============================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# ==============================
+# Spring Boot / Maven
+# ==============================
+tax-management-system/target/
+tax-management-system/.mvn/
+tax-management-system/.env
+tax-management-system/.env.*
+!tax-management-system/.env.example
+
+# ==============================
+# IDE
+# ==============================
+.idea/
+.vscode/
+*.iml
+
+# ==============================
+# Java
+# ==============================
+*.class
+
+# ==============================
+# Logs
+# ==============================
+*.log
+
+# ==============================
+# OS
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Temporary files
+# ==============================
+*.tmp
+*.temp
+
+# Development scripts
+*.ps1
+
+# Accidental temporary file
+type
