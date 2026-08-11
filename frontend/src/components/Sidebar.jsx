@@ -23,57 +23,21 @@ import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 
 const mainLinks = [
-  {
-    to: "/",
-    icon: LayoutDashboard,
-    label: "Dashboard",
-  },
-  {
-    to: "/users",
-    icon: Users,
-    label: "Users",
-  },
-  {
-    to: "/tax/compute",
-    icon: Calculator,
-    label: "Tax Computation",
-  },
-  {
-    to: "/tax/history/1",
-    icon: History,
-    label: "Tax History",
-  },
+  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/users", icon: Users, label: "Users" },
+  { to: "/tax/compute", icon: Calculator, label: "Tax Computation" },
+  { to: "/tax/history/1", icon: History, label: "Tax History" },
 ];
 
 const reportLinks = [
-  {
-    to: "/reports",
-    icon: ChartNoAxesCombined,
-    label: "Reports",
-  },
-  {
-    to: "/backup",
-    icon: DatabaseBackup,
-    label: "Backup & Restore",
-  },
-  {
-    to: "/ai-assistant",
-    icon: Bot,
-    label: "AI Assistant",
-  },
+  { to: "/reports", icon: ChartNoAxesCombined, label: "Reports" },
+  { to: "/backup", icon: DatabaseBackup, label: "Backup & Restore" },
+  { to: "/ai-assistant", icon: Bot, label: "AI Assistant" },
 ];
 
 const systemLinks = [
-  {
-    to: "/profile",
-    icon: UserCircle,
-    label: "Profile",
-  },
-  {
-    to: "/settings",
-    icon: Settings,
-    label: "Settings",
-  },
+  { to: "/profile", icon: UserCircle, label: "Profile" },
+  { to: "/settings", icon: Settings, label: "Settings" },
 ];
 
 function SidebarLinks({ links, onNavigate }) {
@@ -89,11 +53,11 @@ function SidebarLinks({ links, onNavigate }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               [
-                "mx-3 flex h-10 items-center gap-3 rounded-lg px-3",
+                "sidebar-item mx-3 flex h-10 items-center gap-3 rounded-lg px-3",
                 "text-sm font-medium transition-colors duration-150",
                 isActive
-                  ? "bg-[#4F46E5] text-white shadow-[0_4px_12px_rgba(79,70,229,0.25)]"
-                  : "text-[#CBD5E1] hover:bg-white/10 hover:text-white",
+                  ? "active"
+                  : "",
               ].join(" ")
             }
           >
@@ -101,7 +65,9 @@ function SidebarLinks({ links, onNavigate }) {
               <>
                 <Icon
                   className={`h-[18px] w-[18px] shrink-0 ${
-                    isActive ? "text-white" : "text-[#AAB2CC]"
+                    isActive
+                      ? "text-white"
+                      : "text-[var(--sidebar-muted)]"
                   }`}
                 />
 
@@ -119,15 +85,16 @@ function SidebarContent({ onNavigate }) {
   const { darkMode, toggle } = useTheme();
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="sidebar-theme flex h-full flex-col">
+
       {/* Brand */}
-      <div className="flex h-16 shrink-0 items-center border-b border-white/10 px-5">
+      <div className="flex h-16 shrink-0 items-center border-b border-[var(--sidebar-border)] px-5">
         <div>
-          <h2 className="text-base font-bold text-white">
+          <h2 className="text-base font-bold">
             Tax Management
           </h2>
 
-          <p className="text-xs text-[#7F8AA8]">
+          <p className="text-xs text-[var(--sidebar-muted)]">
             System
           </p>
         </div>
@@ -135,8 +102,9 @@ function SidebarContent({ onNavigate }) {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-6 overflow-y-auto py-5">
+
         <section>
-          <p className="mb-2 px-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7F8AA8]">
+          <p className="sidebar-section-title mb-2 px-5 text-[11px] font-semibold uppercase tracking-[0.08em]">
             Main
           </p>
 
@@ -147,7 +115,7 @@ function SidebarContent({ onNavigate }) {
         </section>
 
         <section>
-          <p className="mb-2 px-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7F8AA8]">
+          <p className="sidebar-section-title mb-2 px-5 text-[11px] font-semibold uppercase tracking-[0.08em]">
             Reports & Tools
           </p>
 
@@ -158,7 +126,7 @@ function SidebarContent({ onNavigate }) {
         </section>
 
         <section>
-          <p className="mb-2 px-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7F8AA8]">
+          <p className="sidebar-section-title mb-2 px-5 text-[11px] font-semibold uppercase tracking-[0.08em]">
             System
           </p>
 
@@ -167,14 +135,24 @@ function SidebarContent({ onNavigate }) {
             onNavigate={onNavigate}
           />
         </section>
+
       </nav>
 
       {/* Bottom */}
-      <div className="shrink-0 border-t border-white/10 p-4">
+      <div className="shrink-0 border-t border-[var(--sidebar-border)] p-4">
+
         <button
           type="button"
           onClick={toggle}
-          className="flex h-10 w-full items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-3 text-[13px] text-[#CBD5E1] transition-colors hover:bg-white/10"
+          className="
+            flex h-10 w-full items-center gap-3 rounded-lg
+            border border-[var(--sidebar-border)]
+            bg-[var(--sidebar-hover)]
+            px-3 text-[13px]
+            text-[var(--sidebar-foreground)]
+            transition-colors
+            hover:opacity-90
+          "
         >
           {darkMode ? (
             <Sun className="h-[18px] w-[18px]" />
@@ -187,9 +165,10 @@ function SidebarContent({ onNavigate }) {
           </span>
         </button>
 
-        <p className="mt-3 text-center text-[11px] text-[#66708D]">
+        <p className="mt-3 text-center text-[11px] text-[var(--sidebar-muted)]">
           TaxManager v1.0.0
         </p>
+
       </div>
     </div>
   );
@@ -208,7 +187,13 @@ export default function Sidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed left-3 top-3 z-50 bg-white shadow-md dark:bg-gray-800 lg:hidden"
+        className="
+          fixed left-3 top-3 z-50
+          bg-[var(--card)]
+          text-[var(--foreground)]
+          shadow-md
+          lg:hidden
+        "
         onClick={() => setMobileOpen((prev) => !prev)}
         aria-label={mobileOpen ? "Close sidebar" : "Open sidebar"}
       >
@@ -220,7 +205,15 @@ export default function Sidebar() {
       </Button>
 
       {/* Desktop */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col bg-[#111936] lg:flex">
+      <aside
+        className="
+          sidebar-theme
+          fixed inset-y-0 left-0 z-40
+          hidden w-[248px] flex-col
+          border-r
+          lg:flex
+        "
+      >
         <SidebarContent onNavigate={closeMobile} />
       </aside>
 
@@ -245,7 +238,13 @@ export default function Sidebar() {
                 type: "tween",
                 duration: 0.25,
               }}
-              className="fixed inset-y-0 left-0 z-50 w-[280px] bg-[#111936] lg:hidden"
+              className="
+                sidebar-theme
+                fixed inset-y-0 left-0 z-50
+                w-[280px]
+                border-r
+                lg:hidden
+              "
             >
               <SidebarContent onNavigate={closeMobile} />
             </motion.aside>

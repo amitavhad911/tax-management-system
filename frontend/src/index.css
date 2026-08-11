@@ -59,6 +59,7 @@ textarea {
   font: inherit;
 }
 
+
 /* =========================================================
    THEME VARIABLES
    ========================================================= */
@@ -98,17 +99,17 @@ textarea {
     --destructive-foreground: #ffffff;
 
     /* Focus */
-    --ring: rgba(79, 70, 229, 0.25);
+    --ring: rgba(79, 70, 229, 0.22);
 
     /* Radius */
     --radius: 0.75rem;
 
     /* Sidebar */
-    --sidebar-background: #ffffff;
-    --sidebar-foreground: #334155;
-    --sidebar-muted: #64748b;
-    --sidebar-border: #e2e8f0;
-    --sidebar-hover: #eef2ff;
+    --sidebar-background: #0f172a;
+    --sidebar-foreground: #cbd5e1;
+    --sidebar-muted: #94a3b8;
+    --sidebar-border: #1e293b;
+    --sidebar-hover: #1e293b;
     --sidebar-active: #4f46e5;
     --sidebar-active-foreground: #ffffff;
 
@@ -123,7 +124,7 @@ textarea {
     --chart-fill: rgba(79, 70, 229, 0.08);
 
     /* Shadows */
-    --shadow-color: rgba(15, 23, 42, 0.08);
+    --shadow-color: rgba(15, 23, 42, 0.07);
   }
 
   /* =======================================================
@@ -158,7 +159,7 @@ textarea {
     --ring: rgba(99, 102, 241, 0.3);
 
     /* Sidebar */
-    --sidebar-background: #111a33;
+    --sidebar-background: #0f172a;
     --sidebar-foreground: #f8fafc;
     --sidebar-muted: #94a3b8;
     --sidebar-border: #1e293b;
@@ -187,6 +188,7 @@ textarea {
   }
 }
 
+
 /* =========================================================
    BASE COMPONENT COLORS
    ========================================================= */
@@ -200,7 +202,9 @@ textarea {
   .theme-card {
     background-color: var(--card);
     color: var(--card-foreground);
+    border: 1px solid var(--border);
     border-color: var(--border);
+    box-shadow: 0 1px 2px var(--shadow-color);
   }
 
   .theme-border {
@@ -258,7 +262,7 @@ textarea {
 
   input::placeholder,
   textarea::placeholder {
-    color: #94a3b8;
+    color: var(--muted-foreground);
   }
 
   input:focus,
@@ -276,10 +280,11 @@ textarea {
   .theme-primary-button {
     background-color: var(--primary);
     color: var(--primary-foreground);
+    border: 1px solid var(--primary);
   }
 
   .theme-primary-button:hover {
-    filter: brightness(0.94);
+    filter: brightness(0.95);
   }
 
   .theme-secondary-button {
@@ -290,6 +295,7 @@ textarea {
 
   .theme-secondary-button:hover {
     background-color: var(--accent);
+    color: var(--accent-foreground);
   }
 
   /* =======================================================
@@ -330,6 +336,7 @@ textarea {
   }
 }
 
+
 /* =========================================================
    SIDEBAR & NAV RESET
    ========================================================= */
@@ -344,6 +351,7 @@ textarea {
   color: inherit;
 }
 
+
 /* =========================================================
    ACCESSIBILITY
    ========================================================= */
@@ -352,6 +360,7 @@ textarea {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
 
 /* =========================================================
    SMOOTH THEME TRANSITION
@@ -373,5 +382,113 @@ table,
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* =========================================================
+   LIGHT MODE CARD POLISH
+   ========================================================= */
+
+:root .card,
+:root [class*="rounded"][class*="bg-white"] {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   LIGHT MODE SCROLLBAR
+   ========================================================= */
+
+:root {
+  scrollbar-color: #cbd5e1 #f8fafc;
+  scrollbar-width: thin;
+}
+
+:root::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:root::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+:root::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+:root::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* =========================================================
+   DARK MODE SCROLLBAR
+   ========================================================= */
+
+.dark {
+  scrollbar-color: #334155 #0f172a;
+  scrollbar-width: thin;
+}
+
+.dark::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.dark::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.dark::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* =========================================================
+   LOGIN / FORM INPUT VISIBILITY FIX
+   ========================================================= */
+
+input,
+select,
+textarea {
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  background-color: var(--card) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-foreground) !important;
+  opacity: 1 !important;
+}
+
+/* Dark mode - make entered text clearly visible */
+.dark input,
+.dark select,
+.dark textarea {
+  color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  background-color: #111827 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+/* Browser autofill */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f8fafc !important;
+  box-shadow: 0 0 0 1000px #111827 inset !important;
 }

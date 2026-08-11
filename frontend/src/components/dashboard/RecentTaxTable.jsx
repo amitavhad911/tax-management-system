@@ -56,19 +56,24 @@ export default function RecentTaxTable() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
     >
-      <Card className="border border-[#E2E8F0] dark:border-gray-700 rounded-xl">
+      <Card className="theme-card rounded-xl">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div>
-            <CardTitle className="text-base font-semibold">
+            <CardTitle className="text-base font-semibold text-[var(--foreground)]">
               Recent Tax Computations
             </CardTitle>
 
-            <p className="text-xs text-[#64748B] dark:text-gray-400 mt-1">
+            <p className="mt-1 text-xs text-[var(--muted-foreground)]">
               Recently prepared tax computations
             </p>
           </div>
 
-          <Button variant="ghost" size="sm" asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-[var(--foreground)] hover:bg-[var(--muted)]"
+          >
             <Link
               to="/tax/history/1"
               className="flex items-center gap-1 text-sm"
@@ -80,31 +85,31 @@ export default function RecentTaxTable() {
         </CardHeader>
 
         <CardContent>
-          <div className="rounded-lg border border-[#E2E8F0] dark:border-gray-700 overflow-hidden">
+          <div className="overflow-hidden rounded-lg border border-[var(--border)]">
             <Table>
-              <TableHeader className="bg-[#F8FAFC] dark:bg-gray-800">
+              <TableHeader className="bg-[var(--muted)]">
                 <TableRow>
-                  <TableHead className="text-xs font-semibold">
+                  <TableHead className="text-xs font-semibold text-[var(--secondary-foreground)]">
                     Taxpayer
                   </TableHead>
 
-                  <TableHead className="text-xs font-semibold">
+                  <TableHead className="text-xs font-semibold text-[var(--secondary-foreground)]">
                     Financial Year
                   </TableHead>
 
-                  <TableHead className="text-xs font-semibold">
+                  <TableHead className="text-xs font-semibold text-[var(--secondary-foreground)]">
                     Taxable Income
                   </TableHead>
 
-                  <TableHead className="text-xs font-semibold">
+                  <TableHead className="text-xs font-semibold text-[var(--secondary-foreground)]">
                     Tax Amount
                   </TableHead>
 
-                  <TableHead className="text-xs font-semibold">
+                  <TableHead className="text-xs font-semibold text-[var(--secondary-foreground)]">
                     Date
                   </TableHead>
 
-                  <TableHead className="text-xs font-semibold">
+                  <TableHead className="text-xs font-semibold text-[var(--secondary-foreground)]">
                     Status
                   </TableHead>
                 </TableRow>
@@ -143,18 +148,18 @@ export default function RecentTaxTable() {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="py-12 text-center"
+                      className="py-12 text-center text-[var(--foreground)]"
                     >
                       <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-[#EEF2FF] flex items-center justify-center mb-3">
-                          <Calculator className="w-5 h-5 text-[#4F46E5]" />
+                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)]">
+                          <Calculator className="h-5 w-5 text-[var(--primary)]" />
                         </div>
 
-                        <p className="font-medium text-sm">
+                        <p className="text-sm font-medium text-[var(--foreground)]">
                           No tax computations found
                         </p>
 
-                        <p className="text-xs text-[#64748B] mt-1">
+                        <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                           Prepare a tax computation to see it here.
                         </p>
                       </div>
@@ -164,27 +169,27 @@ export default function RecentTaxTable() {
                   records.map((r) => (
                     <TableRow
                       key={r.id}
-                      className="hover:bg-[#F8FAFC] dark:hover:bg-gray-800"
+                      className="hover:bg-[var(--muted)]"
                     >
-                      <TableCell className="font-medium text-sm">
+                      <TableCell className="text-sm font-medium text-[var(--foreground)]">
                         {r.userName ||
                           r.user?.fullName ||
                           "N/A"}
                       </TableCell>
 
-                      <TableCell className="text-sm">
+                      <TableCell className="text-sm text-[var(--foreground)]">
                         {r.financialYear}
                       </TableCell>
 
-                      <TableCell className="text-sm">
+                      <TableCell className="text-sm text-[var(--foreground)]">
                         {formatCurrency(r.taxableIncome)}
                       </TableCell>
 
-                      <TableCell className="text-sm font-semibold">
+                      <TableCell className="text-sm font-semibold text-[var(--foreground)]">
                         {formatCurrency(r.taxAmount)}
                       </TableCell>
 
-                      <TableCell className="text-sm text-[#64748B]">
+                      <TableCell className="text-sm text-[var(--muted-foreground)]">
                         {r.createdDate
                           ? format(
                               new Date(r.createdDate),
@@ -196,7 +201,7 @@ export default function RecentTaxTable() {
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className="text-[11px] bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
+                          className="border-emerald-200 bg-emerald-50 text-[11px] text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400"
                         >
                           Completed
                         </Badge>
@@ -208,8 +213,9 @@ export default function RecentTaxTable() {
             </Table>
           </div>
 
-          <div className="flex items-center gap-2 mt-4 text-xs text-[#64748B]">
-            <FileText className="w-4 h-4" />
+          <div className="mt-4 flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
+            <FileText className="h-4 w-4" />
+
             Tax computations include taxable income, deductions, tax rate
             and final tax liability.
           </div>

@@ -9,7 +9,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
@@ -30,11 +30,10 @@ export default function LoginPage() {
 
       toast.success("Login successful");
 
-      // Open dashboard after successful login
       navigate("/", { replace: true });
-
     } catch (err) {
       console.error("Login error:", err);
+
       toast.error(
         err.response?.data?.message || "Invalid credentials"
       );
@@ -45,21 +44,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md shadow-xl border-0 rounded-2xl">
+      <Card className="w-full max-w-md shadow-xl border-0 rounded-2xl bg-white dark:bg-gray-950">
 
         <CardHeader className="text-center space-y-3">
 
+          {/* Application Icon */}
           <div className="flex justify-center">
             <div className="w-14 h-14 bg-[#4F46E5] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <LayoutDashboard className="w-7 h-7 text-white" />
             </div>
           </div>
 
-          <CardTitle className="text-2xl">
+          {/* Application Title */}
+          <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
             Tax Management System
           </CardTitle>
 
-          <CardDescription>
+          {/* Description */}
+          <CardDescription className="text-slate-600 dark:text-slate-400">
             Sign in to your admin account
           </CardDescription>
 
@@ -69,28 +71,33 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
 
+            {/* Username */}
             <Input
               type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="h-11"
+              autoComplete="username"
+              className="h-11 bg-white text-slate-900 placeholder:text-slate-500 border-slate-300 dark:bg-gray-900 dark:text-white dark:placeholder:text-slate-400 dark:border-gray-700"
               required
             />
 
+            {/* Password */}
             <Input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11"
+              autoComplete="current-password"
+              className="h-11 bg-white text-slate-900 placeholder:text-slate-500 border-slate-300 dark:bg-gray-900 dark:text-white dark:placeholder:text-slate-400 dark:border-gray-700"
               required
             />
 
+            {/* Sign In */}
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11"
+              className="w-full h-11 bg-[#4F46E5] text-white hover:bg-[#4338CA]"
             >
               {loading ? "Signing in..." : "Sign In"}
             </Button>

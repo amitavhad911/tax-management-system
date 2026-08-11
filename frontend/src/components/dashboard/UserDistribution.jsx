@@ -5,12 +5,14 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { motion } from "framer-motion";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -31,7 +33,6 @@ export default function UserDistribution({ dashboard }) {
         data: [individualCount, institutionalCount],
 
         backgroundColor: ["#4F46E5", "#10B981"],
-
         hoverBackgroundColor: ["#4338CA", "#059669"],
 
         borderWidth: 0,
@@ -54,6 +55,7 @@ export default function UserDistribution({ dashboard }) {
         callbacks: {
           label: (context) => {
             const value = context.raw || 0;
+
             const percentage = total
               ? ((value / total) * 100).toFixed(1)
               : 0;
@@ -71,22 +73,23 @@ export default function UserDistribution({ dashboard }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.1 }}
     >
-      <Card className="h-full border border-[#E2E8F0] dark:border-gray-700 rounded-xl">
+      <Card className="h-full border border-[#E2E8F0] bg-white rounded-xl dark:border-gray-700 dark:bg-gray-800">
         <CardHeader>
-          <CardTitle className="text-base font-semibold">
+          <CardTitle className="text-base font-semibold text-[#0F172A] dark:text-white">
             Taxpayer Distribution
           </CardTitle>
 
-          <p className="text-xs text-[#64748B] dark:text-gray-400">
+          <p className="mt-1 text-xs text-[#64748B] dark:text-gray-400">
             Individual vs institutional taxpayers
           </p>
         </CardHeader>
 
         <CardContent>
-          <div className="relative h-[220px] flex items-center justify-center">
+          {/* Chart */}
+          <div className="relative flex h-[220px] items-center justify-center">
             <Doughnut data={data} options={options} />
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-2xl font-bold text-[#0F172A] dark:text-white">
                 {total}
               </span>
@@ -97,12 +100,15 @@ export default function UserDistribution({ dashboard }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="rounded-lg bg-[#EEF2FF] dark:bg-indigo-950/30 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#4F46E5]" />
+          {/* Distribution cards */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
 
-                <span className="text-xs text-[#64748B] dark:text-gray-400">
+            {/* Individuals */}
+            <div className="rounded-lg border border-[#E0E7FF] bg-[#EEF2FF] p-3 dark:border-indigo-900/40 dark:bg-indigo-950/30">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
+
+                <span className="text-xs font-medium text-[#475569] dark:text-gray-400">
                   Individuals
                 </span>
               </div>
@@ -112,11 +118,12 @@ export default function UserDistribution({ dashboard }) {
               </p>
             </div>
 
-            <div className="rounded-lg bg-[#ECFDF5] dark:bg-emerald-950/30 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+            {/* Institutional */}
+            <div className="rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-3 dark:border-emerald-900/40 dark:bg-emerald-950/30">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#10B981]" />
 
-                <span className="text-xs text-[#64748B] dark:text-gray-400">
+                <span className="text-xs font-medium text-[#475569] dark:text-gray-400">
                   Institutional
                 </span>
               </div>
@@ -125,6 +132,7 @@ export default function UserDistribution({ dashboard }) {
                 {institutionalCount}
               </p>
             </div>
+
           </div>
         </CardContent>
       </Card>

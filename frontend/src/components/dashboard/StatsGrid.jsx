@@ -1,18 +1,31 @@
-import { Users, UserRound, Building2, Wallet, TrendingUp } from "lucide-react";
+import {
+  Users,
+  UserRound,
+  Building2,
+  Wallet,
+  TrendingUp,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../utils/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const iconBgMap = {
-  users: "bg-[#EEF2FF] text-[#4F46E5]",
-  individuals: "bg-[#ECFDF5] text-[#10B981]",
-  institutional: "bg-[#FFF7ED] text-[#F59E0B]",
-  tax: "bg-[#EFF6FF] text-[#3B82F6]",
-  top: "bg-[#FEF2F2] text-[#EF4444]",
+  users: "bg-[var(--accent)] text-[var(--primary)]",
+  individuals: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400",
+  institutional: "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
+  tax: "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
+  top: "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400",
 };
 
-const StatCard = ({ title, value, icon: Icon, type, route, loading }) => {
+const StatCard = ({
+  title,
+  value,
+  icon: Icon,
+  type,
+  route,
+  loading,
+}) => {
   const navigate = useNavigate();
 
   return (
@@ -20,33 +33,48 @@ const StatCard = ({ title, value, icon: Icon, type, route, loading }) => {
       whileHover={{ y: -3 }}
       transition={{ duration: 0.15 }}
       onClick={() => route && navigate(route)}
-      className={`bg-white dark:bg-gray-800 border border-[#E2E8F0] dark:border-gray-700 rounded-xl p-5 min-h-[130px] flex flex-col justify-between ${
-        route ? "cursor-pointer" : ""
-      }`}
+      className={`
+        theme-card
+        rounded-xl
+        p-5
+        min-h-[130px]
+        flex flex-col justify-between
+        transition-all duration-200
+        ${
+          route
+            ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-md"
+            : ""
+        }
+      `}
     >
       <div className="flex items-start justify-between">
         <div
-          className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconBgMap[type]}`}
+          className={`
+            w-11 h-11
+            rounded-xl
+            flex items-center justify-center
+            ${iconBgMap[type]}
+          `}
         >
           <Icon className="w-5 h-5" />
         </div>
 
         {route && (
-          <span className="text-xs text-[#64748B] dark:text-gray-400">
+          <span className="text-xs text-[var(--muted-foreground)]">
             View →
           </span>
         )}
       </div>
 
       <div>
-        <p className="text-sm text-[#64748B] dark:text-gray-400 mb-1">
+        <p className="mb-1 text-sm text-[var(--muted-foreground)]">
           {title}
         </p>
 
         {loading ? (
           <Skeleton className="h-7 w-28" />
         ) : (
-          <p className="text-xl font-bold text-[#0F172A] dark:text-white truncate">
+          <p className="text-xl font-bold text-[var(--foreground)] truncate">
             {value}
           </p>
         )}
@@ -59,7 +87,7 @@ export default function StatsGrid({ dashboard, loading }) {
   const data = dashboard || {};
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+    <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-5">
       <StatCard
         title="Total Users"
         value={data.totalUsers ?? 0}

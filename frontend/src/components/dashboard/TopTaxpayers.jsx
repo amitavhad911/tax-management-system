@@ -48,25 +48,30 @@ export default function TopTaxpayers() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.3 }}
     >
-      <Card className="h-full border border-[#E2E8F0] dark:border-gray-700 rounded-xl">
+      <Card className="theme-card h-full rounded-xl">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div>
-            <CardTitle className="text-base font-semibold">
+            <CardTitle className="text-base font-semibold text-[var(--foreground)]">
               Top Taxpayers
             </CardTitle>
 
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="mt-1 text-xs text-[var(--muted-foreground)]">
               Highest tax contribution
             </p>
           </div>
 
-          <Button variant="ghost" size="sm" asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-[var(--foreground)] hover:bg-[var(--muted)]"
+          >
             <Link
               to="/reports"
               className="flex items-center gap-1 text-sm"
             >
               View All
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="h-4 w-4" />
             </Link>
           </Button>
         </CardHeader>
@@ -92,13 +97,13 @@ export default function TopTaxpayers() {
             </div>
           ) : top.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center">
-              <Users className="w-8 h-8 text-muted-foreground mb-2" />
+              <Users className="mb-2 h-8 w-8 text-[var(--muted-foreground)]" />
 
-              <p className="text-sm font-medium">
+              <p className="text-sm font-medium text-[var(--foreground)]">
                 No taxpayer data available
               </p>
 
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                 Tax computations will appear here.
               </p>
             </div>
@@ -111,42 +116,42 @@ export default function TopTaxpayers() {
                   <Link
                     key={taxpayer.userId || index}
                     to={`/tax/history/${taxpayer.userId}`}
-                    className="flex items-center gap-3 py-3 px-2 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-[var(--muted)]"
                   >
-                    <div className="w-9 h-9 rounded-full bg-[#EEF2FF] dark:bg-indigo-950 flex items-center justify-center">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)]">
                       {rank <= 3 ? (
                         <Medal
-                          className={`w-5 h-5 ${
+                          className={`h-5 w-5 ${
                             rank === 1
                               ? "text-amber-500"
                               : rank === 2
-                              ? "text-gray-400"
-                              : "text-orange-600"
+                                ? "text-slate-400"
+                                : "text-orange-600"
                           }`}
                         />
                       ) : (
-                        <span className="text-sm font-semibold text-[#64748B]">
+                        <span className="text-sm font-semibold text-[var(--muted-foreground)]">
                           {rank}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-[var(--foreground)]">
                         {taxpayer.userName || "Unknown Taxpayer"}
                       </p>
 
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-[var(--muted-foreground)]">
                         Rank #{rank}
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <p className="text-sm font-semibold">
+                      <p className="text-sm font-semibold text-[var(--foreground)]">
                         {formatCurrency(taxpayer.taxAmount)}
                       </p>
 
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-[var(--muted-foreground)]">
                         Tax paid
                       </p>
                     </div>
@@ -157,15 +162,15 @@ export default function TopTaxpayers() {
           )}
 
           {!loading && top.length > 0 && (
-            <div className="mt-4 pt-4 border-t flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Trophy className="w-4 h-4" />
+            <div className="mt-4 flex items-center justify-between border-t border-[var(--border)] pt-4">
+              <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
+                <Trophy className="h-4 w-4" />
                 Top 5 taxpayers
               </div>
 
               <Link
                 to="/reports"
-                className="text-xs font-medium text-primary hover:underline"
+                className="text-xs font-medium text-[var(--primary)] hover:underline"
               >
                 View full report
               </Link>

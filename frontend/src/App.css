@@ -3,12 +3,17 @@
    Application-level styles
    ========================================================= */
 
-/* Page content helper */
+
+/* =========================================================
+   PAGE CONTENT
+   ========================================================= */
+
 .page-container {
   width: 100%;
   max-width: 1600px;
   margin-inline: auto;
 }
+
 
 /* =========================================================
    CARDS
@@ -16,9 +21,12 @@
 
 .dashboard-card {
   background: var(--card);
+  color: var(--card-foreground);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: 0 1px 3px var(--shadow-color);
 }
+
 
 /* =========================================================
    TABLES
@@ -29,7 +37,9 @@
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  background: var(--card);
 }
+
 
 /* =========================================================
    FORM HELPERS
@@ -46,6 +56,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
 
 /* =========================================================
    PAGE TITLES
@@ -64,6 +75,7 @@
   color: var(--muted-foreground);
 }
 
+
 /* =========================================================
    LOADING
    ========================================================= */
@@ -75,6 +87,7 @@
   justify-content: center;
 }
 
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -85,6 +98,7 @@
     line-height: 1.75rem;
   }
 }
+
 
 /* =========================================================
    REDUCED MOTION

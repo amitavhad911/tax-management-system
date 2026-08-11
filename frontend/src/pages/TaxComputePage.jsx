@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -306,7 +307,7 @@ export default function TaxComputePage() {
 
           {/* Form */}
 
-          <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 xl:col-span-2">
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 xl:col-span-2">
 
             <CardContent className="p-6">
 
@@ -642,7 +643,7 @@ export default function TaxComputePage() {
 
           {/* Tax Slabs */}
 
-          <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
 
             <CardContent className="p-6">
 
@@ -739,7 +740,7 @@ export default function TaxComputePage() {
 
         {result && (
 
-          <Card className="overflow-hidden border-emerald-200 bg-white shadow-sm dark:border-emerald-500/20 dark:bg-slate-900">
+          <Card className="overflow-hidden border-emerald-200 bg-white text-slate-900 shadow-sm dark:border-emerald-500/20 dark:bg-slate-900 dark:text-slate-100">
 
             <div className="border-b border-emerald-100 bg-emerald-50/70 px-6 py-4 dark:border-emerald-500/20 dark:bg-emerald-500/10">
 
