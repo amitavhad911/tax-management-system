@@ -5,7 +5,11 @@ const ThemeContext = createContext(null);
 export function ThemeProvider({ children }) {
   const [darkMode, setDarkMode] = useState(() => {
     try {
-      return localStorage.getItem("theme") === "dark";
+      // New theme key so old "dark" preference does not force dark mode
+      const savedTheme = localStorage.getItem("tax-theme-v2");
+
+      // Light mode is the default
+      return savedTheme === "dark";
     } catch {
       return false;
     }
@@ -17,7 +21,10 @@ export function ThemeProvider({ children }) {
     root.classList.toggle("dark", darkMode);
 
     try {
-      localStorage.setItem("theme", darkMode ? "dark" : "light");
+      localStorage.setItem(
+        "tax-theme-v2",
+        darkMode ? "dark" : "light"
+      );
     } catch {
       // Ignore localStorage errors
     }
