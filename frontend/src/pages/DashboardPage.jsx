@@ -37,6 +37,8 @@ export default function DashboardPage() {
   return (
     <PageTransition>
       <div className="space-y-6">
+
+        {/* ================= HEADER ================= */}
         <div className="flex items-start justify-between gap-4">
           <DashboardHeader />
 
@@ -47,30 +49,51 @@ export default function DashboardPage() {
             disabled={loading}
             className="gap-2 shrink-0"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${
+                loading ? "animate-spin" : ""
+              }`}
+            />
             Refresh
           </Button>
         </div>
 
-        <StatsGrid dashboard={dashboard} loading={loading} />
+        {/* ================= STATS ================= */}
+        <StatsGrid
+          dashboard={dashboard}
+          loading={loading}
+        />
 
+        {/* ================= CHARTS ================= */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <TaxCollectionChart />
           </div>
 
-          <UserDistribution dashboard={dashboard} />
+          <UserDistribution
+            dashboard={dashboard}
+          />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        {/* ================= RECENT + TOP TAXPAYERS ================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+
+          {/* LEFT COLUMN */}
+          <div className="lg:col-span-2 space-y-6">
+
             <RecentTaxTable />
+
+            <QuickActions />
+
           </div>
 
-          <TopTaxpayers />
+          {/* RIGHT COLUMN */}
+          <div>
+            <TopTaxpayers />
+          </div>
+
         </div>
 
-        <QuickActions />
       </div>
     </PageTransition>
   );
