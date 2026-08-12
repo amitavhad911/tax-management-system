@@ -129,7 +129,7 @@ export default function Navbar() {
               variant="ghost"
               className="flex items-center gap-2 px-2 text-foreground hover:bg-accent"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F46E5] text-sm font-semibold text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0EA5E9] text-sm font-semibold text-white">
                 A
               </div>
 
