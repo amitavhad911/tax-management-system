@@ -18,7 +18,7 @@ const LoadingSpinner = ({
       aria-label="Loading"
     >
       <div
-        className={`animate-spin rounded-full border-indigo-500 border-t-transparent ${
+        className={`animate-spin rounded-full border-sky-500 border-t-transparent ${
           sizes[size] || sizes.md
         }`}
       />
