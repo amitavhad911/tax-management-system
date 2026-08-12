@@ -50,7 +50,7 @@ export default function LoginPage() {
 
           {/* Application Icon */}
           <div className="flex justify-center">
-            <div className="w-14 h-14 bg-[#4F46E5] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div className="w-14 h-14 bg-[#0EA5E9] rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/20">
               <LayoutDashboard className="w-7 h-7 text-white" />
             </div>
           </div>
@@ -97,7 +97,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-[#4F46E5] text-white hover:bg-[#4338CA]"
+              className="w-full h-11 bg-[#0EA5E9] text-white hover:bg-[#0284C7]"
             >
               {loading ? "Signing in..." : "Sign In"}
             </Button>

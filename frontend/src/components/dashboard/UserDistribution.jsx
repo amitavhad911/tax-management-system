@@ -32,8 +32,8 @@ export default function UserDistribution({ dashboard }) {
       {
         data: [individualCount, institutionalCount],
 
-        backgroundColor: ["#4F46E5", "#10B981"],
-        hoverBackgroundColor: ["#4338CA", "#059669"],
+        backgroundColor: ["#0EA5E9", "#10B981"],
+        hoverBackgroundColor: ["#0284C7", "#059669"],
 
         borderWidth: 0,
       },
@@ -104,16 +104,16 @@ export default function UserDistribution({ dashboard }) {
           <div className="mt-4 grid grid-cols-2 gap-3">
 
             {/* Individuals */}
-            <div className="rounded-lg border border-[#E0E7FF] bg-[#EEF2FF] p-3 dark:border-indigo-900/40 dark:bg-indigo-950/30">
+            <div className="rounded-lg border border-[#BAE6FD] bg-[#E0F2FE] p-3 dark:border-sky-900/40 dark:bg-sky-950/30">
               <div className="mb-1 flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#0EA5E9]" />
 
                 <span className="text-xs font-medium text-[#475569] dark:text-gray-400">
                   Individuals
                 </span>
               </div>
 
-              <p className="text-lg font-bold text-[#4F46E5]">
+              <p className="text-lg font-bold text-[#0EA5E9]">
                 {individualCount}
               </p>
             </div>

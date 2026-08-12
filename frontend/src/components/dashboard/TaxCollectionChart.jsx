@@ -9,12 +9,14 @@ import {
   Legend,
   Filler,
 } from "chart.js";
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { motion } from "framer-motion";
 
 ChartJS.register(
@@ -35,13 +37,18 @@ export default function TaxCollectionChart() {
       {
         label: "Tax Collected",
         data: [12000, 19000, 25000, 22000, 30000, 32000],
-        borderColor: "#4F46E5",
-        backgroundColor: "rgba(79,70,229,0.08)",
+
+        borderColor: "#0EA5E9",
+
+        backgroundColor: "rgba(14,165,233,0.08)",
+
         fill: true,
         tension: 0.4,
+
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: "#4F46E5",
+
+        pointBackgroundColor: "#0EA5E9",
       },
     ],
   };
@@ -63,7 +70,9 @@ export default function TaxCollectionChart() {
       tooltip: {
         callbacks: {
           label: (context) =>
-            ` Tax Collected: ₹${Number(context.raw).toLocaleString("en-IN")}`,
+            ` Tax Collected: ₹${Number(
+              context.raw
+            ).toLocaleString("en-IN")}`,
         },
       },
     },
@@ -110,7 +119,8 @@ export default function TaxCollectionChart() {
             </div>
 
             <div className="flex items-center gap-2 text-xs">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#4F46E5]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9]" />
+
               <span className="text-[#64748B] dark:text-gray-400">
                 Tax Collected
               </span>

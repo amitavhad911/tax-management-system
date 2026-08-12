@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -251,7 +250,7 @@ export default function TaxComputePage() {
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400">
 
               <Calculator className="h-5 w-5" />
 
@@ -276,19 +275,19 @@ export default function TaxComputePage() {
 
         {/* Regime Information */}
 
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+        <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
 
           <div className="flex items-start gap-3">
 
-            <Info className="mt-0.5 h-5 w-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-600 dark:text-sky-400" />
 
             <div>
 
-              <p className="font-semibold text-indigo-900 dark:text-indigo-200">
+              <p className="font-semibold text-sky-900 dark:text-sky-200">
                 New Tax Regime — FY 2025-26
               </p>
 
-              <p className="mt-1 text-sm text-indigo-700 dark:text-indigo-300">
+              <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">
                 Tax is calculated according to the applicable New Tax Regime
                 slabs. Rebate under Section 87A is applied where applicable.
               </p>
@@ -350,7 +349,7 @@ export default function TaxComputePage() {
                           <select
                             {...field}
                             disabled={loadingUsers}
-                            className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                            className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                           >
 
                             <option value="">
@@ -394,11 +393,11 @@ export default function TaxComputePage() {
 
                   {selectedUser && (
 
-                    <div className="rounded-xl border border-indigo-100 bg-indigo-50/70 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                    <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
 
                       <div className="flex items-start gap-3">
 
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400">
 
                           {selectedUser.userType === "INSTITUTIONAL" ? (
 
@@ -619,7 +618,7 @@ export default function TaxComputePage() {
                         isSubmitting ||
                         loadingUsers
                       }
-                      className="bg-indigo-600 px-6 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                      className="bg-sky-600 px-6 text-white hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600"
                     >
 
                       <Calculator className="mr-2 h-4 w-4" />
@@ -824,13 +823,13 @@ export default function TaxComputePage() {
                   }
                 />
 
-                <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
 
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     Total Tax Liability
                   </p>
 
-                  <p className="mt-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                  <p className="mt-2 text-2xl font-bold text-sky-600 dark:text-sky-400">
                     {formatCurrency(
                       result.taxAmount
                     )}
@@ -893,7 +892,7 @@ function ResultItem({
     <div
       className={`rounded-xl border p-4 ${
         highlight
-          ? "border-indigo-200 bg-indigo-50/70 dark:border-indigo-500/20 dark:bg-indigo-500/10"
+          ? "border-sky-200 bg-sky-50/70 dark:border-sky-500/20 dark:bg-sky-500/10"
           : "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/50"
       }`}
     >
@@ -917,7 +916,7 @@ function ResultItem({
       <p
         className={`mt-2 text-lg font-semibold ${
           highlight
-            ? "text-indigo-600 dark:text-indigo-400"
+            ? "text-sky-600 dark:text-sky-400"
             : "text-slate-900 dark:text-slate-100"
         }`}
       >

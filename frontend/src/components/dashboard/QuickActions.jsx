@@ -1,122 +1,139 @@
+import { Line } from "react-chartjs-2";
 import {
-  UserPlus,
-  Calculator,
-  History,
-  ChartNoAxesCombined,
-  Download,
-  Upload,
-} from "lucide-react";
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
 
-import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 import { motion } from "framer-motion";
 
-const actions = [
-  {
-    label: "Add Taxpayer",
-    description: "Register individual or institution",
-    icon: UserPlus,
-    route: "/users/add",
-    color:
-      "bg-[#EEF2FF] text-[#4F46E5] hover:bg-[#E0E7FF]",
-  },
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+  Filler
+);
 
-  {
-    label: "Compute Tax",
-    description: "Prepare yearly tax computation",
-    icon: Calculator,
-    route: "/tax/compute",
-    color:
-      "bg-[#ECFDF5] text-[#10B981] hover:bg-[#D1FAE5]",
-  },
+export default function TaxCollectionChart() {
+  const data = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
 
-  {
-    label: "Tax History",
-    description: "View previous tax computations",
-    icon: History,
-    route: "/users",
-    color:
-      "bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#DBEAFE]",
-  },
+    datasets: [
+      {
+        label: "Tax Collected",
+        data: [12000, 19000, 25000, 22000, 30000, 32000],
 
-  {
-    label: "Tax Reports",
-    description: "Top taxpayers and analytics",
-    icon: ChartNoAxesCombined,
-    route: "/reports",
-    color:
-      "bg-[#FFF7ED] text-[#F59E0B] hover:bg-[#FFEDD5]",
-  },
+        borderColor: "#0EA5E9",
 
-  {
-    label: "Export Data",
-    description: "Save system backup",
-    icon: Download,
-    route: "/backup",
-    color:
-      "bg-[#F5F3FF] text-[#7C3AED] hover:bg-[#EDE9FE]",
-  },
+        backgroundColor: "rgba(14,165,233,0.08)",
 
-  {
-    label: "Restore Data",
-    description: "Restore previous backup",
-    icon: Upload,
-    route: "/backup",
-    color:
-      "bg-[#FEF2F2] text-[#EF4444] hover:bg-[#FEE2E2]",
-  },
-];
+        fill: true,
+        tension: 0.4,
 
-export default function QuickActions() {
-  const navigate = useNavigate();
+        pointRadius: 4,
+        pointHoverRadius: 6,
+
+        pointBackgroundColor: "#0EA5E9",
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    interaction: {
+      intersect: false,
+      mode: "index",
+    },
+
+    plugins: {
+      legend: {
+        display: false,
+      },
+
+      tooltip: {
+        callbacks: {
+          label: (context) =>
+            ` Tax Collected: ₹${Number(
+              context.raw
+            ).toLocaleString("en-IN")}`,
+        },
+      },
+    },
+
+    scales: {
+      y: {
+        beginAtZero: true,
+
+        grid: {
+          color: "#E2E8F0",
+        },
+
+        ticks: {
+          callback: (value) =>
+            `₹${Number(value).toLocaleString("en-IN")}`,
+        },
+      },
+
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+    },
+  };
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.4 }}
-      className="mt-6"
+      transition={{ duration: 0.3 }}
     >
-      <div className="mb-4">
-        <h2 className="text-base font-semibold">
-          Quick Actions
-        </h2>
+      <Card className="border border-[#E2E8F0] dark:border-gray-700 rounded-xl">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base font-semibold">
+                Tax Collection Overview
+              </CardTitle>
 
-        <p className="text-sm text-muted-foreground mt-1">
-          Access common tax management operations
-        </p>
-      </div>
+              <p className="text-xs text-[#64748B] dark:text-gray-400 mt-1">
+                Monthly tax collection trend
+              </p>
+            </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {actions.map((action) => {
-          const Icon = action.icon;
+            <div className="flex items-center gap-2 text-xs">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9]" />
 
-          return (
-            <motion.button
-              key={action.label}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => navigate(action.route)}
-              className="flex items-center gap-4 p-4 rounded-xl border border-[#E2E8F0] dark:border-gray-700 bg-white dark:bg-gray-800 text-left transition-all hover:shadow-sm"
-            >
-              <div
-                className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${action.color}`}
-              >
-                <Icon className="w-5 h-5" />
-              </div>
+              <span className="text-[#64748B] dark:text-gray-400">
+                Tax Collected
+              </span>
+            </div>
+          </div>
+        </CardHeader>
 
-              <div className="min-w-0">
-                <p className="text-sm font-semibold">
-                  {action.label}
-                </p>
-
-                <p className="text-xs text-muted-foreground mt-1">
-                  {action.description}
-                </p>
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-    </motion.section>
+        <CardContent>
+          <div className="h-[300px]">
+            <Line data={data} options={options} />
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
