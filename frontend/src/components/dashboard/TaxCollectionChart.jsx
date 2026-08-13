@@ -19,8 +19,6 @@ import {
 
 import { motion } from "framer-motion";
 
-import { useEffect, useState } from "react";
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -31,45 +29,10 @@ ChartJS.register(
   Filler
 );
 
-export default function TaxCollectionChart() {
-
-  const [taxCollection, setTaxCollection] = useState([]);
-
-  useEffect(() => {
-
-    const fetchTaxCollection = async () => {
-      try {
-
-        const response = await fetch("/api/reports/dashboard");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
-
-        const result = await response.json();
-
-        setTaxCollection(
-          result?.data?.taxCollectionByFinancialYear || []
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Error fetching tax collection:",
-          error
-        );
-
-        setTaxCollection([]);
-      }
-    };
-
-    fetchTaxCollection();
-
-  }, []);
-
-
+export default function TaxCollectionChart({
+  taxCollection = [],
+}) {
   const data = {
-
     labels: taxCollection.map(
       (item) => item.financialYear
     ),
@@ -84,8 +47,7 @@ export default function TaxCollectionChart() {
 
         borderColor: "#0EA5E9",
 
-        backgroundColor:
-          "rgba(14,165,233,0.08)",
+        backgroundColor: "rgba(14,165,233,0.08)",
 
         fill: true,
 
@@ -100,9 +62,7 @@ export default function TaxCollectionChart() {
     ],
   };
 
-
   const options = {
-
     responsive: true,
 
     maintainAspectRatio: false,
@@ -113,15 +73,12 @@ export default function TaxCollectionChart() {
     },
 
     plugins: {
-
       legend: {
         display: false,
       },
 
       tooltip: {
-
         callbacks: {
-
           label: (context) =>
             ` Tax Collected: ₹${Number(
               context.raw
@@ -131,9 +88,7 @@ export default function TaxCollectionChart() {
     },
 
     scales: {
-
       y: {
-
         beginAtZero: true,
 
         grid: {
@@ -141,14 +96,12 @@ export default function TaxCollectionChart() {
         },
 
         ticks: {
-
           callback: (value) =>
             `₹${Number(value).toLocaleString("en-IN")}`,
         },
       },
 
       x: {
-
         grid: {
           display: false,
         },
@@ -156,9 +109,7 @@ export default function TaxCollectionChart() {
     },
   };
 
-
   return (
-
     <motion.div
       initial={{
         opacity: 0,
@@ -172,15 +123,10 @@ export default function TaxCollectionChart() {
         duration: 0.3,
       }}
     >
-
       <Card className="border border-[#E2E8F0] dark:border-gray-700 rounded-xl">
-
         <CardHeader className="pb-2">
-
           <div className="flex items-center justify-between">
-
             <div>
-
               <CardTitle className="text-base font-semibold">
                 Tax Collection Overview
               </CardTitle>
@@ -188,49 +134,33 @@ export default function TaxCollectionChart() {
               <p className="text-xs text-[#64748B] dark:text-gray-400 mt-1">
                 Financial year-wise tax collection
               </p>
-
             </div>
 
             <div className="flex items-center gap-2 text-xs">
-
               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9]" />
 
               <span className="text-[#64748B] dark:text-gray-400">
                 Tax Collected
               </span>
-
             </div>
-
           </div>
-
         </CardHeader>
 
-
         <CardContent>
-
           <div className="h-[300px]">
-
             {taxCollection.length > 0 ? (
-
               <Line
                 data={data}
                 options={options}
               />
-
             ) : (
-
               <div className="h-full flex items-center justify-center text-sm text-gray-500">
                 No tax collection data available
               </div>
-
             )}
-
           </div>
-
         </CardContent>
-
       </Card>
-
     </motion.div>
   );
 }
