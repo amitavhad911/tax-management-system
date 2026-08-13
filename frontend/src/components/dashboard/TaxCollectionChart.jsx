@@ -19,6 +19,8 @@ import {
 
 import { motion } from "framer-motion";
 
+import { useEffect, useState } from "react";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -30,22 +32,67 @@ ChartJS.register(
 );
 
 export default function TaxCollectionChart() {
+
+  const [taxCollection, setTaxCollection] = useState([]);
+
+  useEffect(() => {
+
+    const fetchTaxCollection = async () => {
+      try {
+
+        const response = await fetch("/api/reports/dashboard");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+
+        const result = await response.json();
+
+        setTaxCollection(
+          result?.data?.taxCollectionByFinancialYear || []
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Error fetching tax collection:",
+          error
+        );
+
+        setTaxCollection([]);
+      }
+    };
+
+    fetchTaxCollection();
+
+  }, []);
+
+
   const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+
+    labels: taxCollection.map(
+      (item) => item.financialYear
+    ),
 
     datasets: [
       {
         label: "Tax Collected",
-        data: [12000, 19000, 25000, 22000, 30000, 32000],
+
+        data: taxCollection.map(
+          (item) => Number(item.taxAmount)
+        ),
 
         borderColor: "#0EA5E9",
 
-        backgroundColor: "rgba(14,165,233,0.08)",
+        backgroundColor:
+          "rgba(14,165,233,0.08)",
 
         fill: true,
+
         tension: 0.4,
 
         pointRadius: 4,
+
         pointHoverRadius: 6,
 
         pointBackgroundColor: "#0EA5E9",
@@ -53,8 +100,11 @@ export default function TaxCollectionChart() {
     ],
   };
 
+
   const options = {
+
     responsive: true,
+
     maintainAspectRatio: false,
 
     interaction: {
@@ -63,12 +113,15 @@ export default function TaxCollectionChart() {
     },
 
     plugins: {
+
       legend: {
         display: false,
       },
 
       tooltip: {
+
         callbacks: {
+
           label: (context) =>
             ` Tax Collected: ₹${Number(
               context.raw
@@ -78,7 +131,9 @@ export default function TaxCollectionChart() {
     },
 
     scales: {
+
       y: {
+
         beginAtZero: true,
 
         grid: {
@@ -86,12 +141,14 @@ export default function TaxCollectionChart() {
         },
 
         ticks: {
+
           callback: (value) =>
             `₹${Number(value).toLocaleString("en-IN")}`,
         },
       },
 
       x: {
+
         grid: {
           display: false,
         },
@@ -99,41 +156,81 @@ export default function TaxCollectionChart() {
     },
   };
 
+
   return (
+
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={{
+        opacity: 0,
+        y: 15,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.3,
+      }}
     >
+
       <Card className="border border-[#E2E8F0] dark:border-gray-700 rounded-xl">
+
         <CardHeader className="pb-2">
+
           <div className="flex items-center justify-between">
+
             <div>
+
               <CardTitle className="text-base font-semibold">
                 Tax Collection Overview
               </CardTitle>
 
               <p className="text-xs text-[#64748B] dark:text-gray-400 mt-1">
-                Monthly tax collection trend
+                Financial year-wise tax collection
               </p>
+
             </div>
 
             <div className="flex items-center gap-2 text-xs">
+
               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9]" />
 
               <span className="text-[#64748B] dark:text-gray-400">
                 Tax Collected
               </span>
+
             </div>
+
           </div>
+
         </CardHeader>
 
+
         <CardContent>
+
           <div className="h-[300px]">
-            <Line data={data} options={options} />
+
+            {taxCollection.length > 0 ? (
+
+              <Line
+                data={data}
+                options={options}
+              />
+
+            ) : (
+
+              <div className="h-full flex items-center justify-center text-sm text-gray-500">
+                No tax collection data available
+              </div>
+
+            )}
+
           </div>
+
         </CardContent>
+
       </Card>
+
     </motion.div>
   );
 }

@@ -2,6 +2,7 @@ package com.taxmanagement.service.impl;
 
 import com.taxmanagement.dto.response.DashboardResponseDTO;
 import com.taxmanagement.dto.response.SummaryResponseDTO;
+import com.taxmanagement.dto.response.TaxCollectionDTO;
 import com.taxmanagement.dto.response.TopTaxpayerResponseDTO;
 import com.taxmanagement.entity.TaxRecord;
 import com.taxmanagement.entity.User;
@@ -41,16 +42,36 @@ public class ReportServiceImpl implements ReportService {
 
         long totalUsers = individualCount + institutionalCount;
 
-        BigDecimal totalTax = taxRecordRepository.getTotalTaxCollected();
+        BigDecimal totalTax =
+                taxRecordRepository.getTotalTaxCollected();
 
         if (totalTax == null) {
             totalTax = BigDecimal.ZERO;
         }
 
+        // =====================================================
+        // FINANCIAL YEAR-WISE TAX COLLECTION
+        // =====================================================
+
+        List<TaxCollectionDTO> taxCollectionByFinancialYear =
+                taxRecordRepository.getTaxCollectionByFinancialYear()
+                        .stream()
+                        .map(row -> new TaxCollectionDTO(
+                                (String) row[0],
+                                (BigDecimal) row[1]
+                        ))
+                        .collect(Collectors.toList());
+
+        // =====================================================
+        // HIGHEST TAXPAYER
+        // =====================================================
+
         TopTaxpayerResponseDTO highest = null;
 
         List<TaxRecord> topList =
-                taxRecordRepository.findTopTaxPayers(PageRequest.of(0, 1));
+                taxRecordRepository.findTopTaxPayers(
+                        PageRequest.of(0, 1)
+                );
 
         if (!topList.isEmpty()) {
 
@@ -65,28 +86,35 @@ public class ReportServiceImpl implements ReportService {
                     .build();
         }
 
+        // =====================================================
+        // DASHBOARD RESPONSE
+        // =====================================================
+
         return DashboardResponseDTO.builder()
                 .totalUsers(totalUsers)
                 .individualCount(individualCount)
                 .institutionalCount(institutionalCount)
                 .totalTaxCollected(totalTax)
                 .highestTaxpayer(highest)
+                .taxCollectionByFinancialYear(
+                        taxCollectionByFinancialYear
+                )
                 .build();
     }
 
     @Override
     public List<TopTaxpayerResponseDTO> getTopTaxpayers(int n) {
 
-        // Prevent invalid or extremely large requests
         if (n <= 0) {
             n = 5;
         }
 
-        // Optional upper limit
         n = Math.min(n, 50);
 
         List<TaxRecord> top =
-                taxRecordRepository.findTopTaxPayers(PageRequest.of(0, n));
+                taxRecordRepository.findTopTaxPayers(
+                        PageRequest.of(0, n)
+                );
 
         return IntStream.range(0, top.size())
                 .mapToObj(i -> {
@@ -107,7 +135,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public SummaryResponseDTO getSummary() {
 
-        long totalRecords = taxRecordRepository.count();
+        long totalRecords =
+                taxRecordRepository.count();
 
         BigDecimal totalTax =
                 taxRecordRepository.getTotalTaxCollected();

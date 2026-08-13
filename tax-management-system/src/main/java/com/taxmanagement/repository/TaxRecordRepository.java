@@ -14,6 +14,10 @@ import java.util.List;
 public interface TaxRecordRepository
         extends JpaRepository<TaxRecord, Long> {
 
+    // =========================================================
+    // USER TAX RECORDS
+    // =========================================================
+
     List<TaxRecord> findByUserIdOrderByFinancialYearDesc(
             Long userId
     );
@@ -23,11 +27,48 @@ public interface TaxRecordRepository
             String financialYear
     );
 
+
+    // =========================================================
+    // TOTAL TAX - ALL FINANCIAL YEARS
+    // =========================================================
+
     @Query("""
             SELECT COALESCE(SUM(t.taxAmount), 0)
             FROM TaxRecord t
             """)
     BigDecimal getTotalTaxCollected();
+
+
+    // =========================================================
+    // TOTAL TAX - SPECIFIC FINANCIAL YEAR
+    // =========================================================
+
+    @Query("""
+            SELECT COALESCE(SUM(t.taxAmount), 0)
+            FROM TaxRecord t
+            WHERE t.financialYear = :financialYear
+            """)
+    BigDecimal getTotalTaxCollectedByFinancialYear(
+            @Param("financialYear") String financialYear
+    );
+
+
+    // =========================================================
+    // TAX COLLECTION - FINANCIAL YEAR WISE
+    // =========================================================
+
+    @Query("""
+            SELECT t.financialYear, COALESCE(SUM(t.taxAmount), 0)
+            FROM TaxRecord t
+            GROUP BY t.financialYear
+            ORDER BY t.financialYear
+            """)
+    List<Object[]> getTaxCollectionByFinancialYear();
+
+
+    // =========================================================
+    // AVERAGE TAX - ALL FINANCIAL YEARS
+    // =========================================================
 
     @Query("""
             SELECT COALESCE(AVG(t.taxAmount), 0)
@@ -35,14 +76,25 @@ public interface TaxRecordRepository
             """)
     BigDecimal getAverageTaxAmount();
 
-    /*
-     * Returns tax records ordered by tax amount.
-     *
-     * NOTE:
-     * This is still record-based, not user-aggregated.
-     * Keep this if your dashboard means the highest
-     * single tax computation.
-     */
+
+    // =========================================================
+    // AVERAGE TAX - SPECIFIC FINANCIAL YEAR
+    // =========================================================
+
+    @Query("""
+            SELECT COALESCE(AVG(t.taxAmount), 0)
+            FROM TaxRecord t
+            WHERE t.financialYear = :financialYear
+            """)
+    BigDecimal getAverageTaxAmountByFinancialYear(
+            @Param("financialYear") String financialYear
+    );
+
+
+    // =========================================================
+    // TOP TAXPAYERS - ALL RECORDS
+    // =========================================================
+
     @Query("""
             SELECT t
             FROM TaxRecord t
@@ -52,6 +104,27 @@ public interface TaxRecordRepository
             Pageable pageable
     );
 
+
+    // =========================================================
+    // TOP TAXPAYERS - SPECIFIC FINANCIAL YEAR
+    // =========================================================
+
+    @Query("""
+            SELECT t
+            FROM TaxRecord t
+            WHERE t.financialYear = :financialYear
+            ORDER BY t.taxAmount DESC
+            """)
+    List<TaxRecord> findTopTaxPayersByFinancialYear(
+            @Param("financialYear") String financialYear,
+            Pageable pageable
+    );
+
+
+    // =========================================================
+    // USER RECORD COUNT
+    // =========================================================
+
     @Query("""
             SELECT COUNT(t)
             FROM TaxRecord t
@@ -59,5 +132,19 @@ public interface TaxRecordRepository
             """)
     long countByUserId(
             @Param("userId") Long userId
+    );
+
+
+    // =========================================================
+    // RECORD COUNT - SPECIFIC FINANCIAL YEAR
+    // =========================================================
+
+    @Query("""
+            SELECT COUNT(t)
+            FROM TaxRecord t
+            WHERE t.financialYear = :financialYear
+            """)
+    long countByFinancialYear(
+            @Param("financialYear") String financialYear
     );
 }
