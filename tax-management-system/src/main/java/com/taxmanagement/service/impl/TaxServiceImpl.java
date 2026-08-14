@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class TaxServiceImpl implements TaxService {
     private final TaxRecordRepository taxRecordRepository;
     private final UserRepository userRepository;
 
+    @Override
     public TaxRecordResponseDTO computeAndSave(
             TaxComputeRequestDTO request) {
 
@@ -35,6 +37,7 @@ public class TaxServiceImpl implements TaxService {
                         )
                 );
 
+        // Prevent duplicate tax computation
         boolean alreadyExists =
                 !taxRecordRepository
                         .findByUserIdAndFinancialYear(
@@ -49,11 +52,28 @@ public class TaxServiceImpl implements TaxService {
             );
         }
 
+        BigDecimal deductions =
+                request.getDeductions() != null
+                        ? request.getDeductions()
+                        : BigDecimal.ZERO;
+
+        BigDecimal expenses =
+                request.getExpenses() != null
+                        ? request.getExpenses()
+                        : BigDecimal.ZERO;
+
+        /*
+         * Tax calculation is delegated to TaxCalculator.
+         *
+         * Financial year and user type are passed dynamically.
+         * Therefore, TaxServiceImpl does NOT hardcode
+         * 2025-2026 or any particular financial year.
+         */
         TaxCalculator.TaxResult result =
                 TaxCalculator.calculate(
                         request.getGrossIncome(),
-                        request.getDeductions(),
-                        request.getExpenses(),
+                        deductions,
+                        expenses,
                         user.getUserType(),
                         request.getFinancialYear()
                 );
@@ -61,8 +81,8 @@ public class TaxServiceImpl implements TaxService {
         TaxRecord record = TaxRecord.builder()
                 .financialYear(request.getFinancialYear())
                 .grossIncome(request.getGrossIncome())
-                .deductions(request.getDeductions())
-                .expenses(request.getExpenses())
+                .deductions(deductions)
+                .expenses(expenses)
                 .taxableIncome(result.taxableIncome())
                 .incomeTax(result.incomeTax())
                 .cess(result.cess())
@@ -76,6 +96,7 @@ public class TaxServiceImpl implements TaxService {
         return mapToDTO(record);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public TaxRecordResponseDTO getTaxRecordById(Long id) {
 
@@ -91,6 +112,7 @@ public class TaxServiceImpl implements TaxService {
         return mapToDTO(record);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<TaxRecordResponseDTO> getTaxHistoryByUser(
             Long userId) {
@@ -109,6 +131,7 @@ public class TaxServiceImpl implements TaxService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public TaxRecordResponseDTO updateTaxRecord(
             Long id,
             TaxComputeRequestDTO request) {
@@ -122,13 +145,16 @@ public class TaxServiceImpl implements TaxService {
                                 )
                         );
 
+        Long userId = record.getUser().getId();
+
+        // Prevent duplicate financial-year record
         if (!record.getFinancialYear()
                 .equals(request.getFinancialYear())) {
 
             boolean alreadyExists =
                     !taxRecordRepository
                             .findByUserIdAndFinancialYear(
-                                    record.getUser().getId(),
+                                    userId,
                                     request.getFinancialYear()
                             )
                             .isEmpty();
@@ -140,19 +166,33 @@ public class TaxServiceImpl implements TaxService {
             }
         }
 
+        BigDecimal deductions =
+                request.getDeductions() != null
+                        ? request.getDeductions()
+                        : BigDecimal.ZERO;
+
+        BigDecimal expenses =
+                request.getExpenses() != null
+                        ? request.getExpenses()
+                        : BigDecimal.ZERO;
+
+        /*
+         * Recalculate tax whenever income,
+         * deductions, expenses or financial year changes.
+         */
         TaxCalculator.TaxResult result =
                 TaxCalculator.calculate(
                         request.getGrossIncome(),
-                        request.getDeductions(),
-                        request.getExpenses(),
+                        deductions,
+                        expenses,
                         record.getUser().getUserType(),
                         request.getFinancialYear()
                 );
 
         record.setFinancialYear(request.getFinancialYear());
         record.setGrossIncome(request.getGrossIncome());
-        record.setDeductions(request.getDeductions());
-        record.setExpenses(request.getExpenses());
+        record.setDeductions(deductions);
+        record.setExpenses(expenses);
 
         record.setTaxableIncome(result.taxableIncome());
         record.setIncomeTax(result.incomeTax());
@@ -166,6 +206,7 @@ public class TaxServiceImpl implements TaxService {
         return mapToDTO(updated);
     }
 
+    @Override
     public void deleteTaxRecord(Long id) {
 
         TaxRecord record =
@@ -192,16 +233,12 @@ public class TaxServiceImpl implements TaxService {
                 .deductions(record.getDeductions())
                 .expenses(record.getExpenses())
                 .taxableIncome(record.getTaxableIncome())
-
                 .incomeTax(record.getIncomeTax())
                 .cess(record.getCess())
-
                 .taxRate(record.getTaxRate())
                 .taxAmount(record.getTaxAmount())
-
                 .createdDate(record.getCreatedDate())
                 .updatedDate(record.getUpdatedDate())
-
                 .userId(user.getId())
                 .userName(user.getFullName())
                 .panNumber(user.getPanNumber())

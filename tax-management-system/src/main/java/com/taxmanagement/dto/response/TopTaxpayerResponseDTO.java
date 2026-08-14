@@ -1,5 +1,6 @@
 package com.taxmanagement.dto.response;
 
+import com.taxmanagement.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class TopTaxpayerResponseDTO {
     private String userName;
 
     private String panNumber;
+
+    private User.UserType userType;
 
     private BigDecimal taxAmount;
 }

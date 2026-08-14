@@ -82,6 +82,10 @@ public class ReportServiceImpl implements ReportService {
                     .userId(top.getUser().getId())
                     .userName(top.getUser().getFullName())
                     .panNumber(top.getUser().getPanNumber())
+
+                    // Taxpayer type
+                    .userType(top.getUser().getUserType())
+
                     .taxAmount(top.getTaxAmount())
                     .build();
         }
@@ -126,6 +130,10 @@ public class ReportServiceImpl implements ReportService {
                             .userId(t.getUser().getId())
                             .userName(t.getUser().getFullName())
                             .panNumber(t.getUser().getPanNumber())
+
+                            // Taxpayer type
+                            .userType(t.getUser().getUserType())
+
                             .taxAmount(t.getTaxAmount())
                             .build();
                 })

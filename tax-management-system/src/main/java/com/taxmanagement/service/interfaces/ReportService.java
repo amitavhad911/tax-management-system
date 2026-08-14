@@ -7,9 +7,14 @@ import com.taxmanagement.dto.response.TopTaxpayerResponseDTO;
 import java.util.List;
 
 public interface ReportService {
+
     DashboardResponseDTO getDashboard();
+
     List<TopTaxpayerResponseDTO> getTopTaxpayers(int n);
+
     SummaryResponseDTO getSummary();
+
     byte[] exportToPdf();
+
     byte[] exportToExcel();
 }
