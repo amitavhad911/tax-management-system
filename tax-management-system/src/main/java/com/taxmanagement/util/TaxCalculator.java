@@ -407,7 +407,8 @@ public class TaxCalculator {
                                             )
                                             .multiply(
                                                     new BigDecimal("0.20")
-                                            );
+                                            )
+                            );
 
         } else {
 
@@ -420,7 +421,8 @@ public class TaxCalculator {
                                             )
                                             .multiply(
                                                     new BigDecimal("0.30")
-                                            );
+                                            )
+                            );
         }
 
         /*
@@ -505,7 +507,8 @@ public class TaxCalculator {
                                             )
                                             .multiply(
                                                     new BigDecimal("0.15")
-                                            );
+                                            )
+                            );
 
         } else if (income.compareTo(
                 new BigDecimal("2000000")) <= 0) {
@@ -519,7 +522,8 @@ public class TaxCalculator {
                                             )
                                             .multiply(
                                                     new BigDecimal("0.20")
-                                            );
+                                            )
+                            );
 
         } else if (income.compareTo(
                 new BigDecimal("2400000")) <= 0) {
@@ -533,7 +537,8 @@ public class TaxCalculator {
                                             )
                                             .multiply(
                                                     new BigDecimal("0.25")
-                                            );
+                                            )
+                            );
 
         } else {
 
@@ -546,7 +551,8 @@ public class TaxCalculator {
                                             )
                                             .multiply(
                                                     new BigDecimal("0.30")
-                                            );
+                                            )
+                            );
         }
 
         /*
