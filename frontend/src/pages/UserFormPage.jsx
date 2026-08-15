@@ -13,6 +13,7 @@ import {
   MapPin,
   CreditCard,
   ShieldCheck,
+  Check,
 } from "lucide-react";
 
 import userService from "../services/userService";
@@ -29,14 +30,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import PageTransition from "../components/PageTransition";
 
@@ -60,6 +53,31 @@ const schema = z.object({
 
   userType: z.enum(["INDIVIDUAL", "INSTITUTIONAL"]),
 });
+
+const ENTITY_OPTIONS = [
+  {
+    value: "INDIVIDUAL",
+    label: "Individual",
+    description: "Personal taxpayer filing on their own PAN.",
+    icon: UserRound,
+    ring: "ring-violet-500",
+    activeBorder: "border-violet-400 dark:border-violet-500/60",
+    activeBg: "bg-violet-50 dark:bg-violet-500/10",
+    iconActiveBg: "bg-violet-600 text-white",
+    textActive: "text-violet-800 dark:text-violet-200",
+  },
+  {
+    value: "INSTITUTIONAL",
+    label: "Institutional",
+    description: "Company, firm, or registered organisation.",
+    icon: Building2,
+    ring: "ring-emerald-500",
+    activeBorder: "border-emerald-400 dark:border-emerald-500/60",
+    activeBg: "bg-emerald-50 dark:bg-emerald-500/10",
+    iconActiveBg: "bg-emerald-600 text-white",
+    textActive: "text-emerald-800 dark:text-emerald-200",
+  },
+];
 
 export default function UserFormPage() {
   const { id } = useParams();
@@ -218,34 +236,83 @@ export default function UserFormPage() {
                   name="userType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Entity Type</FormLabel>
+                      <FormLabel className="sr-only">
+                        Entity Type
+                      </FormLabel>
 
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-11">
-                            <SelectValue placeholder="Select taxpayer type" />
-                          </SelectTrigger>
-                        </FormControl>
+                      <FormControl>
+                        {/*
+                          Segmented toggle instead of a Select dropdown.
+                          Avoids the popover-overlap issue entirely since
+                          there's nothing absolutely positioned here.
+                        */}
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          {ENTITY_OPTIONS.map((option) => {
+                            const Icon = option.icon;
+                            const isActive = field.value === option.value;
 
-                        <SelectContent>
-                          <SelectItem value="INDIVIDUAL">
-                            <div className="flex items-center gap-2">
-                              <UserRound className="h-4 w-4" />
-                              <span>Individual</span>
-                            </div>
-                          </SelectItem>
+                            return (
+                              <button
+                                key={option.value}
+                                type="button"
+                                aria-pressed={isActive}
+                                onClick={() => field.onChange(option.value)}
+                                className={`
+                                  relative flex items-start gap-3 rounded-xl border-2
+                                  px-4 py-3.5 text-left transition-all
+                                  ${
+                                    isActive
+                                      ? `${option.activeBorder} ${option.activeBg} shadow-sm`
+                                      : "border-border bg-card hover:border-muted-foreground/30 hover:bg-muted/30"
+                                  }
+                                `}
+                              >
+                                <div
+                                  className={`
+                                    flex h-10 w-10 shrink-0 items-center justify-center
+                                    rounded-lg transition-colors
+                                    ${
+                                      isActive
+                                        ? option.iconActiveBg
+                                        : "bg-muted text-muted-foreground"
+                                    }
+                                  `}
+                                >
+                                  <Icon className="h-5 w-5" />
+                                </div>
 
-                          <SelectItem value="INSTITUTIONAL">
-                            <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4" />
-                              <span>Institutional</span>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                                <div className="min-w-0">
+                                  <p
+                                    className={`text-sm font-semibold ${
+                                      isActive
+                                        ? option.textActive
+                                        : "text-foreground"
+                                    }`}
+                                  >
+                                    {option.label}
+                                  </p>
+                                  <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+                                    {option.description}
+                                  </p>
+                                </div>
+
+                                {isActive && (
+                                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-current text-card opacity-90">
+                                    <Check
+                                      className={`h-3.5 w-3.5 ${
+                                        option.value === "INDIVIDUAL"
+                                          ? "text-violet-600"
+                                          : "text-emerald-600"
+                                      }`}
+                                      strokeWidth={3}
+                                    />
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </FormControl>
 
                       <FormMessage />
                     </FormItem>

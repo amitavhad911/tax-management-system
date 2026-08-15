@@ -275,52 +275,52 @@ export default function UsersPage() {
 
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
                 <Users className="h-5 w-5" />
               </div>
 
               <div>
-                <p className="text-xs font-medium text-[var(--muted-foreground)]">
+                <p className="text-xs font-semibold text-[var(--muted-foreground)]">
                   Total Taxpayers
                 </p>
 
-                <p className="text-xl font-bold text-[var(--foreground)]">
+                <p className="text-2xl font-bold text-[var(--foreground)]">
                   {users.length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-violet-200 bg-violet-50/60 p-4 shadow-sm dark:border-violet-500/20 dark:bg-violet-500/10">
+          <div className="rounded-xl border border-violet-300 bg-violet-100 p-4 shadow-sm dark:border-violet-500/30 dark:bg-violet-500/15">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-violet-200 text-violet-700 dark:bg-violet-500/25 dark:text-violet-200">
                 <UserRound className="h-5 w-5" />
               </div>
 
               <div>
-                <p className="text-xs font-medium text-violet-700 dark:text-violet-300">
+                <p className="text-xs font-semibold text-violet-800 dark:text-violet-200">
                   Individual Taxpayers
                 </p>
 
-                <p className="text-xl font-bold text-violet-800 dark:text-violet-200">
+                <p className="text-2xl font-bold text-violet-900 dark:text-violet-50">
                   {individualCount}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-500/10">
+          <div className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-500/15">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-200 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-200">
                 <Building2 className="h-5 w-5" />
               </div>
 
               <div>
-                <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">
                   Institutional Taxpayers
                 </p>
 
-                <p className="text-xl font-bold text-emerald-800 dark:text-emerald-200">
+                <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-50">
                   {institutionalCount}
                 </p>
               </div>
@@ -595,25 +595,25 @@ export default function UsersPage() {
                               px-3
                               py-1.5
                               text-xs
-                              font-semibold
+                              font-bold
                               whitespace-nowrap
                               ${
                                 isInstitutional
                                   ? `
-                                    border-emerald-200
-                                    bg-emerald-50
-                                    text-emerald-700
-                                    dark:border-emerald-500/20
-                                    dark:bg-emerald-500/10
-                                    dark:text-emerald-300
+                                    border-emerald-300
+                                    bg-emerald-100
+                                    text-emerald-800
+                                    dark:border-emerald-500/30
+                                    dark:bg-emerald-500/15
+                                    dark:text-emerald-200
                                   `
                                   : `
-                                    border-violet-200
-                                    bg-violet-50
-                                    text-violet-700
-                                    dark:border-violet-500/20
-                                    dark:bg-violet-500/10
-                                    dark:text-violet-300
+                                    border-violet-300
+                                    bg-violet-100
+                                    text-violet-800
+                                    dark:border-violet-500/30
+                                    dark:bg-violet-500/15
+                                    dark:text-violet-200
                                   `
                               }
                             `}
