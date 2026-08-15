@@ -1,286 +1,1121 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import taxService from "../services/taxService";
-import { formatCurrency } from "../utils/format";
-import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 import {
-  ArrowLeft, CalendarDays, FileText, IndianRupee, ReceiptText,
-  Download, FileSpreadsheet, FileDown, Search, RotateCcw,
-  User, Building2,
+  ArrowLeft,
+  CalendarDays,
+  Download,
+  FileSpreadsheet,
+  FileText,
+  History,
+  RefreshCw,
+  Search,
+  Users,
+  WalletCards,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import PageTransition from "../components/PageTransition";
+import taxService from "../services/taxService";
 
-const getInitials = (name = "") =>
-  name.trim().split(/\s+/).filter(Boolean).slice(0, 2)
-    .map((x) => x[0]?.toUpperCase()).join("") || "T";
+
+// ============================================================
+// Helpers
+// ============================================================
+
+const formatCurrency = (value) => {
+  const amount = Number(value || 0);
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
+const getInitial = (name) => {
+  if (!name) return "U";
+
+  return name
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+};
+
+const getTypeLabel = (type) => {
+  if (!type) return "Unknown";
+
+  const normalized = String(type).toUpperCase();
+
+  if (normalized === "INSTITUTIONAL") {
+    return "Institutional";
+  }
+
+  if (normalized === "INDIVIDUAL") {
+    return "Individual";
+  }
+
+  return type;
+};
+
+const escapeCsv = (value) => {
+  const text = String(value ?? "");
+
+  if (
+    text.includes(",") ||
+    text.includes('"') ||
+    text.includes("\n")
+  ) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  return text;
+};
+
+
+// ============================================================
+// Component
+// ============================================================
 
 export default function TaxHistoryPage() {
-  const { userId } = useParams();
-  const navigate = useNavigate();
-
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
-  const [financialYear, setFinancialYear] = useState("ALL");
-  const [taxpayerType, setTaxpayerType] = useState("ALL");
+  const [typeFilter, setTypeFilter] = useState("ALL");
+  const [yearFilter, setYearFilter] = useState("ALL");
+
+  // ----------------------------------------------------------
+  // Load ALL tax history
+  // ----------------------------------------------------------
+
+  const loadHistory = async () => {
+    try {
+      setLoading(true);
+
+      const response = await taxService.getAllHistory();
+
+      const data =
+        response?.data?.data ??
+        response?.data ??
+        [];
+
+      setRecords(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to load tax history:", error);
+
+      setRecords([]);
+
+      toast.error("Failed to load tax history");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadHistory = async () => {
-      setLoading(true);
-      try {
-        const res = await taxService.getHistory(userId);
-        setRecords(res.data.data || []);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to load tax history");
-      } finally {
-        setLoading(false);
-      }
-    };
     loadHistory();
-  }, [userId]);
+  }, []);
 
-  const first = records[0] || {};
-  const taxpayer = first.user || first.taxpayer || {};
-  const taxpayerName =
-    taxpayer.fullName || taxpayer.userName || first.fullName ||
-    first.userName || `Taxpayer #${userId}`;
-  const taxpayerPan =
-    taxpayer.panNumber || taxpayer.pan || first.panNumber || first.pan || "";
-  const taxpayerTypeValue =
-    taxpayer.userType || taxpayer.taxpayerType ||
-    first.userType || first.taxpayerType || "";
+  // ----------------------------------------------------------
+  // Financial years
+  // ----------------------------------------------------------
 
-  const years = useMemo(
-    () => [...new Set(records.map(r => r.financialYear).filter(Boolean))]
-      .sort((a, b) => String(b).localeCompare(String(a))),
-    [records]
-  );
+  const financialYears = useMemo(() => {
+    return [
+      ...new Set(
+        records
+          .map((record) => record.financialYear)
+          .filter(Boolean)
+      ),
+    ].sort((a, b) => String(b).localeCompare(String(a)));
+  }, [records]);
+
+  // ----------------------------------------------------------
+  // Filter records
+  // ----------------------------------------------------------
 
   const filteredRecords = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return records.filter((r) => {
-      const type = String(r.userType || r.taxpayerType || taxpayerTypeValue).toUpperCase();
-      const matchesSearch =
-        !q ||
-        String(r.financialYear || "").toLowerCase().includes(q) ||
-        String(r.id || "").toLowerCase().includes(q);
-      return matchesSearch &&
-        (financialYear === "ALL" || String(r.financialYear) === financialYear) &&
-        (taxpayerType === "ALL" || type === taxpayerType);
-    });
-  }, [records, search, financialYear, taxpayerType, taxpayerTypeValue]);
+    const searchText = search.trim().toLowerCase();
 
-  const totalTax = filteredRecords.reduce((s, r) => s + Number(r.taxAmount || 0), 0);
-  const latestYear = [...filteredRecords].map(r => r.financialYear).filter(Boolean)
-    .sort((a, b) => String(b).localeCompare(String(a)))[0] || "—";
+    return records.filter((record) => {
+      const userName = String(record.userName || "").toLowerCase();
+      const panNumber = String(record.panNumber || "").toLowerCase();
+      const userId = String(record.userId || "").toLowerCase();
+      const financialYear = String(
+        record.financialYear || ""
+      ).toLowerCase();
+
+      const taxpayerType = String(
+        record.userType ||
+        record.taxpayerType ||
+        record.type ||
+        ""
+      ).toUpperCase();
+
+      const matchesSearch =
+        !searchText ||
+        userName.includes(searchText) ||
+        panNumber.includes(searchText) ||
+        userId.includes(searchText) ||
+        financialYear.includes(searchText);
+
+      const matchesType =
+        typeFilter === "ALL" ||
+        taxpayerType === typeFilter;
+
+      const matchesYear =
+        yearFilter === "ALL" ||
+        record.financialYear === yearFilter;
+
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesYear
+      );
+    });
+  }, [records, search, typeFilter, yearFilter]);
+
+  // ----------------------------------------------------------
+  // Summary
+  // ----------------------------------------------------------
+
+  const totalTax = useMemo(() => {
+    return filteredRecords.reduce(
+      (sum, record) =>
+        sum + Number(record.taxAmount || 0),
+      0
+    );
+  }, [filteredRecords]);
+
+  const totalTaxableIncome = useMemo(() => {
+    return filteredRecords.reduce(
+      (sum, record) =>
+        sum + Number(record.taxableIncome || 0),
+      0
+    );
+  }, [filteredRecords]);
+
+  const uniqueTaxpayers = useMemo(() => {
+    return new Set(
+      filteredRecords
+        .map((record) => record.userId)
+        .filter(Boolean)
+    ).size;
+  }, [filteredRecords]);
+
+  // ----------------------------------------------------------
+  // Reset
+  // ----------------------------------------------------------
 
   const resetFilters = () => {
     setSearch("");
-    setFinancialYear("ALL");
-    setTaxpayerType("ALL");
+    setTypeFilter("ALL");
+    setYearFilter("ALL");
   };
+
+  // ----------------------------------------------------------
+  // Excel download
+  // ----------------------------------------------------------
 
   const downloadExcel = () => {
     if (!filteredRecords.length) {
       toast.error("No tax records available to export");
       return;
     }
+
     const headers = [
-      "Financial Year", "Gross Income", "Deductions", "Expenses",
-      "Taxable Income", "Tax Rate", "Tax Amount",
+      "Taxpayer ID",
+      "Taxpayer Name",
+      "PAN",
+      "Taxpayer Type",
+      "Financial Year",
+      "Gross Income",
+      "Deductions",
+      "Expenses",
+      "Taxable Income",
+      "Tax Rate",
+      "Tax Liability",
+      "Computation Date",
     ];
-    const rows = filteredRecords.map(r => [
-      r.financialYear || "", r.grossIncome || 0, r.deductions || 0,
-      r.expenses || 0, r.taxableIncome || 0,
-      r.taxRate != null ? `${r.taxRate}%` : "", r.taxAmount || 0,
+
+    const rows = filteredRecords.map((record) => [
+      record.userId,
+      record.userName,
+      record.panNumber,
+      getTypeLabel(
+        record.userType ||
+        record.taxpayerType ||
+        record.type
+      ),
+      record.financialYear,
+      record.grossIncome,
+      record.deductions,
+      record.expenses,
+      record.taxableIncome,
+      `${record.taxRate ?? 0}%`,
+      record.taxAmount,
+      record.createdDate || "",
     ]);
-    const csv = "\ufeff" + [headers, ...rows]
-      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
-      .join("\r\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `tax-history-${userId || "taxpayer"}.csv`;
-    a.click();
+
+    const csvContent = [
+      headers.map(escapeCsv).join(","),
+      ...rows.map((row) =>
+        row.map(escapeCsv).join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob(
+      ["\ufeff" + csvContent],
+      {
+        type: "text/csv;charset=utf-8;",
+      }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "tax-history.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     URL.revokeObjectURL(url);
-    toast.success("Tax history exported for Excel");
+
+    toast.success("Tax history exported successfully");
   };
+
+  // ----------------------------------------------------------
+  // PDF download
+  // ----------------------------------------------------------
 
   const downloadPdf = () => {
     if (!filteredRecords.length) {
       toast.error("No tax records available to export");
       return;
     }
-    window.print();
+
+    /*
+     * Uses the browser print dialog so the user can select
+     * "Save as PDF".
+     *
+     * This avoids adding another PDF dependency to the project.
+     */
+
+    const printWindow = window.open(
+      "",
+      "_blank",
+      "width=1200,height=800"
+    );
+
+    if (!printWindow) {
+      toast.error("Please allow pop-ups to download PDF");
+      return;
+    }
+
+    const rows = filteredRecords
+      .map(
+        (record) => `
+          <tr>
+            <td>${record.userId ?? "-"}</td>
+            <td>${record.userName ?? "-"}</td>
+            <td>${record.panNumber ?? "-"}</td>
+            <td>${getTypeLabel(
+              record.userType ||
+              record.taxpayerType ||
+              record.type
+            )}</td>
+            <td>${record.financialYear ?? "-"}</td>
+            <td>${formatCurrency(record.taxableIncome)}</td>
+            <td>${record.taxRate ?? 0}%</td>
+            <td>${formatCurrency(record.taxAmount)}</td>
+          </tr>
+        `
+      )
+      .join("");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Tax History Report</title>
+
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 30px;
+              color: #0f172a;
+            }
+
+            h1 {
+              margin-bottom: 4px;
+            }
+
+            p {
+              color: #64748b;
+              margin-top: 0;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 24px;
+              font-size: 12px;
+            }
+
+            th,
+            td {
+              border: 1px solid #cbd5e1;
+              padding: 8px;
+              text-align: left;
+            }
+
+            th {
+              background: #e2e8f0;
+              font-weight: 700;
+            }
+
+            .summary {
+              display: flex;
+              gap: 30px;
+              margin-top: 20px;
+            }
+
+            .summary-item {
+              border: 1px solid #cbd5e1;
+              padding: 12px;
+              min-width: 180px;
+            }
+
+            .label {
+              color: #64748b;
+              font-size: 11px;
+            }
+
+            .value {
+              font-size: 18px;
+              font-weight: 700;
+              margin-top: 5px;
+            }
+
+            @media print {
+              body {
+                padding: 10px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <h1>Tax Management System</h1>
+          <p>Global Tax Computation History</p>
+
+          <div class="summary">
+            <div class="summary-item">
+              <div class="label">Taxpayers</div>
+              <div class="value">
+                ${uniqueTaxpayers}
+              </div>
+            </div>
+
+            <div class="summary-item">
+              <div class="label">Taxable Income</div>
+              <div class="value">
+                ${formatCurrency(totalTaxableIncome)}
+              </div>
+            </div>
+
+            <div class="summary-item">
+              <div class="label">Total Tax Liability</div>
+              <div class="value">
+                ${formatCurrency(totalTax)}
+              </div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Taxpayer ID</th>
+                <th>Name</th>
+                <th>PAN</th>
+                <th>Type</th>
+                <th>Financial Year</th>
+                <th>Taxable Income</th>
+                <th>Tax Rate</th>
+                <th>Tax Liability</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+
+          <script>
+            window.onload = function () {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
   };
 
-  const isInstitutional = String(taxpayerTypeValue).toUpperCase() === "INSTITUTIONAL";
+  // ==========================================================
+  // UI
+  // ==========================================================
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0f172a] dark:text-white">
+      <main className="mx-auto w-full max-w-[1600px] px-5 py-6 lg:px-8">
+
+        {/* ================================================== */}
+        {/* HEADER */}
+        {/* ================================================== */}
+
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+
           <div>
-            <div className="mb-2 flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="gap-2 px-2">
-                <ArrowLeft className="h-4 w-4" /> Users
-              </Button>
+            <Link
+              to="/"
+              className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Dashboard
+            </Link>
+
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400">
+                <History className="h-6 w-6" />
+              </div>
+
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  Tax Computation History
+                </h1>
+
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  View all completed tax computations across taxpayers.
+                </p>
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-[var(--foreground)]">Tax Computation History</h1>
-            <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-              View previous-year tax computations for this taxpayer.
-            </p>
           </div>
-          {!loading && records.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={downloadExcel} className="gap-2">
-                <FileSpreadsheet className="h-4 w-4" /> Download Excel
-              </Button>
-              <Button variant="outline" onClick={downloadPdf} className="gap-2">
-                <FileDown className="h-4 w-4" /> Download PDF
-              </Button>
-            </div>
-          )}
+
+          {/* Export buttons */}
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={downloadExcel}
+              className="
+                inline-flex h-10 items-center gap-2 rounded-lg
+                border border-slate-300
+                bg-white px-4
+                text-sm font-semibold text-slate-700
+                transition
+                hover:border-sky-300
+                hover:bg-sky-50
+                hover:text-sky-600
+                dark:border-slate-700
+                dark:bg-slate-900
+                dark:text-slate-200
+                dark:hover:border-sky-500
+                dark:hover:bg-slate-800
+                dark:hover:text-sky-400
+              "
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Download Excel
+            </button>
+
+            <button
+              type="button"
+              onClick={downloadPdf}
+              className="
+                inline-flex h-10 items-center gap-2 rounded-lg
+                border border-slate-300
+                bg-white px-4
+                text-sm font-semibold text-slate-700
+                transition
+                hover:border-sky-300
+                hover:bg-sky-50
+                hover:text-sky-600
+                dark:border-slate-700
+                dark:bg-slate-900
+                dark:text-slate-200
+                dark:hover:border-sky-500
+                dark:hover:bg-slate-800
+                dark:hover:text-sky-400
+              "
+            >
+              <FileText className="h-4 w-4" />
+              Download PDF
+            </button>
+          </div>
         </div>
 
-        {!loading && records.length > 0 && (
-          <>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                      {getInitials(taxpayerName)}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{taxpayerName}</p>
-                      <div className="flex flex-wrap gap-x-4 text-xs text-muted-foreground">
-                        <span>Taxpayer ID: {userId}</span>
-                        {taxpayerPan && <span>PAN: {taxpayerPan}</span>}
-                      </div>
-                    </div>
-                  </div>
-                  <span className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
-                    isInstitutional
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-violet-100 text-violet-700"
-                  }`}>
-                    {isInstitutional ? <Building2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
-                    {isInstitutional ? "Institutional" : "Individual"}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <Card><CardContent className="p-5"><div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2"><CalendarDays className="h-5 w-5 text-primary" /></div>
-                <div><p className="text-sm text-muted-foreground">Total Years</p><p className="text-xl font-bold">{filteredRecords.length}</p></div>
-              </div></CardContent></Card>
-              <Card><CardContent className="p-5"><div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2"><IndianRupee className="h-5 w-5 text-primary" /></div>
-                <div><p className="text-sm text-muted-foreground">Total Tax Liability</p><p className="text-xl font-bold">{formatCurrency(totalTax)}</p></div>
-              </div></CardContent></Card>
-              <Card><CardContent className="p-5"><div className="flex items-center gap-3">
-                <div className="rounded-lg bg-primary/10 p-2"><ReceiptText className="h-5 w-5 text-primary" /></div>
-                <div><p className="text-sm text-muted-foreground">Latest Financial Year</p><p className="text-xl font-bold">{latestYear}</p></div>
-              </div></CardContent></Card>
+        {/* ================================================== */}
+        {/* SUMMARY CARDS */}
+        {/* ================================================== */}
+
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+
+          {/* Taxpayers */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-[#111827]">
+            <div className="flex items-center gap-4">
+
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400">
+                <Users className="h-5 w-5" />
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Taxpayers
+                </p>
+
+                <p className="mt-1 text-2xl font-bold">
+                  {uniqueTaxpayers}
+                </p>
+              </div>
+
             </div>
-          </>
-        )}
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" /> Completed Tax Computations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1fr_190px_190px_auto]">
+
+          {/* Taxable income */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-[#111827]">
+            <div className="flex items-center gap-4">
+
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
+                <WalletCards className="h-5 w-5" />
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Total Taxable Income
+                </p>
+
+                <p className="mt-1 text-2xl font-bold">
+                  {formatCurrency(totalTaxableIncome)}
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+
+          {/* Tax */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-[#111827]">
+            <div className="flex items-center gap-4">
+
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <FileText className="h-5 w-5" />
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Total Tax Liability
+                </p>
+
+                <p className="mt-1 text-2xl font-bold">
+                  {formatCurrency(totalTax)}
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+
+        {/* ================================================== */}
+        {/* TABLE CARD */}
+        {/* ================================================== */}
+
+        <section className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-[#111827]">
+
+          {/* Card header */}
+
+          <div className="border-b border-slate-200 p-5 dark:border-slate-700">
+
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <History className="h-5 w-5 text-sky-500" />
+                  Completed Tax Computations
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  {filteredRecords.length} computation
+                  {filteredRecords.length === 1 ? "" : "s"} found
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={loadHistory}
+                disabled={loading}
+                className="
+                  inline-flex h-9 items-center justify-center gap-2
+                  rounded-lg border border-slate-300
+                  bg-white px-3
+                  text-sm font-medium text-slate-700
+                  hover:bg-slate-50
+                  disabled:cursor-not-allowed disabled:opacity-50
+                  dark:border-slate-700
+                  dark:bg-slate-900
+                  dark:text-slate-200
+                  dark:hover:bg-slate-800
+                "
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${
+                    loading ? "animate-spin" : ""
+                  }`}
+                />
+
+                Refresh
+              </button>
+
+            </div>
+
+
+            {/* Filters */}
+
+            <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_220px_220px_auto]">
+
+              {/* Search */}
+
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input value={search} onChange={e => setSearch(e.target.value)}
-                  placeholder="Search financial year or computation ID..."
-                  className="h-10 w-full rounded-md border border-[var(--input)] bg-[var(--card)] pl-9 pr-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted-foreground)]" />
-              </div>
-              <select value={taxpayerType} onChange={e => setTaxpayerType(e.target.value)}
-                className="h-10 rounded-md border border-[var(--input)] bg-[var(--card)] px-3 text-sm text-[var(--foreground)]">
-                <option value="ALL">All Taxpayer Types</option>
-                <option value="INDIVIDUAL">Individual</option>
-                <option value="INSTITUTIONAL">Institutional</option>
-              </select>
-              <select value={financialYear} onChange={e => setFinancialYear(e.target.value)}
-                className="h-10 rounded-md border border-[var(--input)] bg-[var(--card)] px-3 text-sm text-[var(--foreground)]">
-                <option value="ALL">All Financial Years</option>
-                {years.map(year => <option key={year} value={year}>{year}</option>)}
-              </select>
-              <Button variant="outline" onClick={resetFilters} className="h-10 gap-2">
-                <RotateCcw className="h-4 w-4" /> Reset
-              </Button>
-            </div>
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 
-            <div className="overflow-x-auto rounded-lg border border-[var(--border)]">
-              <Table>
-                <TableHeader><TableRow>
-                  <TableHead>Financial Year</TableHead><TableHead>Gross Income</TableHead>
-                  <TableHead>Deductions</TableHead><TableHead>Expenses</TableHead>
-                  <TableHead>Taxable Income</TableHead><TableHead>Tax Rate</TableHead>
-                  <TableHead>Tax Liability</TableHead>
-                </TableRow></TableHeader>
-                <TableBody>
-                  {loading ? Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>{Array.from({ length: 7 }).map((_, j) =>
-                      <TableCell key={j}><Skeleton className="h-4 w-[90px]" /></TableCell>
-                    )}</TableRow>
-                  )) : filteredRecords.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
-                      {records.length === 0 ? (
-                        <><p className="font-medium text-[var(--foreground)]">No Completed Tax Computations</p>
-                        <p className="mt-1 text-sm">No taxpayer has a completed tax computation yet.</p></>
-                      ) : (
-                        <><p className="font-medium text-[var(--foreground)]">No matching computations found.</p>
-                        <p className="mt-1 text-sm">Try changing the search or filters.</p>
-                        <Button variant="outline" size="sm" onClick={resetFilters} className="mt-4 gap-2">
-                          <RotateCcw className="h-4 w-4" /> Reset Filters
-                        </Button></>
-                      )}
-                    </TableCell></TableRow>
-                  ) : filteredRecords.map(record => (
-                    <TableRow key={record.id}>
-                      <TableCell><span className="inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">{record.financialYear}</span></TableCell>
-                      <TableCell>{formatCurrency(record.grossIncome)}</TableCell>
-                      <TableCell>{formatCurrency(record.deductions)}</TableCell>
-                      <TableCell>{formatCurrency(record.expenses || 0)}</TableCell>
-                      <TableCell className="font-medium">{formatCurrency(record.taxableIncome)}</TableCell>
-                      <TableCell>{record.taxRate != null ? `${record.taxRate}%` : "—"}</TableCell>
-                      <TableCell className="font-bold text-primary">{formatCurrency(record.taxAmount)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {!loading && filteredRecords.length > 0 && (
-              <div className="mt-4 flex flex-wrap justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={downloadExcel} className="gap-2">
-                  <Download className="h-4 w-4" /> Excel
-                </Button>
-                <Button variant="outline" size="sm" onClick={downloadPdf} className="gap-2">
-                  <FileDown className="h-4 w-4" /> PDF
-                </Button>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(event.target.value)
+                  }
+                  placeholder="Search taxpayer, PAN, ID, or financial year..."
+                  className="
+                    h-10 w-full rounded-lg
+                    border border-slate-300
+                    bg-white pl-10 pr-3
+                    text-sm text-slate-900
+                    outline-none
+                    transition
+                    focus:border-sky-500
+                    focus:ring-2
+                    focus:ring-sky-500/10
+                    dark:border-slate-700
+                    dark:bg-slate-900
+                    dark:text-white
+                  "
+                />
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </PageTransition>
+
+
+              {/* Taxpayer type */}
+
+              <select
+                value={typeFilter}
+                onChange={(event) =>
+                  setTypeFilter(event.target.value)
+                }
+                className="
+                  h-10 rounded-lg
+                  border border-slate-300
+                  bg-white px-3
+                  text-sm text-slate-700
+                  outline-none
+                  focus:border-sky-500
+                  dark:border-slate-700
+                  dark:bg-slate-900
+                  dark:text-slate-200
+                "
+              >
+                <option value="ALL">
+                  All Taxpayer Types
+                </option>
+
+                <option value="INDIVIDUAL">
+                  Individual
+                </option>
+
+                <option value="INSTITUTIONAL">
+                  Institutional
+                </option>
+              </select>
+
+
+              {/* Financial year */}
+
+              <select
+                value={yearFilter}
+                onChange={(event) =>
+                  setYearFilter(event.target.value)
+                }
+                className="
+                  h-10 rounded-lg
+                  border border-slate-300
+                  bg-white px-3
+                  text-sm text-slate-700
+                  outline-none
+                  focus:border-sky-500
+                  dark:border-slate-700
+                  dark:bg-slate-900
+                  dark:text-slate-200
+                "
+              >
+                <option value="ALL">
+                  All Financial Years
+                </option>
+
+                {financialYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+
+
+              {/* Reset */}
+
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="
+                  inline-flex h-10 items-center justify-center gap-2
+                  rounded-lg border border-slate-300
+                  bg-white px-4
+                  text-sm font-medium text-slate-700
+                  hover:bg-slate-50
+                  dark:border-slate-700
+                  dark:bg-slate-900
+                  dark:text-slate-200
+                  dark:hover:bg-slate-800
+                "
+              >
+                Reset
+              </button>
+
+            </div>
+          </div>
+
+
+          {/* ================================================= */}
+          {/* LOADING */}
+          {/* ================================================= */}
+
+          {loading && (
+            <div className="flex min-h-[280px] items-center justify-center p-8">
+              <div className="flex flex-col items-center gap-3">
+
+                <RefreshCw className="h-7 w-7 animate-spin text-sky-500" />
+
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Loading tax history...
+                </p>
+
+              </div>
+            </div>
+          )}
+
+
+          {/* ================================================= */}
+          {/* EMPTY */}
+          {/* ================================================= */}
+
+          {!loading && filteredRecords.length === 0 && (
+            <div className="flex min-h-[320px] flex-col items-center justify-center p-8 text-center">
+
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                <History className="h-7 w-7" />
+              </div>
+
+              <h3 className="text-base font-semibold">
+                No tax computations found
+              </h3>
+
+              <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">
+                No completed tax computations match the
+                selected search and filters.
+              </p>
+
+              {(search ||
+                typeFilter !== "ALL" ||
+                yearFilter !== "ALL") && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="mt-4 text-sm font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400"
+                >
+                  Clear filters
+                </button>
+              )}
+
+            </div>
+          )}
+
+
+          {/* ================================================= */}
+          {/* TABLE */}
+          {/* ================================================= */}
+
+          {!loading && filteredRecords.length > 0 && (
+            <div className="overflow-x-auto">
+
+              <table className="w-full min-w-[1150px] text-sm">
+
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-left dark:border-slate-700 dark:bg-slate-800/70">
+
+                    <th className="px-4 py-3 font-semibold">
+                      Taxpayer
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Taxpayer ID
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      PAN
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Type
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Financial Year
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Gross Income
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Taxable Income
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Tax Rate
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Tax Liability
+                    </th>
+
+                    <th className="px-4 py-3 font-semibold">
+                      Status
+                    </th>
+
+                  </tr>
+                </thead>
+
+
+                <tbody>
+
+                  {filteredRecords.map((record) => {
+
+                    const taxpayerType =
+                      record.userType ||
+                      record.taxpayerType ||
+                      record.type ||
+                      "";
+
+                    const typeLabel =
+                      getTypeLabel(taxpayerType);
+
+                    const isInstitutional =
+                      String(taxpayerType).toUpperCase() ===
+                      "INSTITUTIONAL";
+
+                    return (
+                      <tr
+                        key={
+                          record.id ??
+                          `${record.userId}-${record.financialYear}`
+                        }
+                        className="
+                          border-b border-slate-100
+                          transition
+                          hover:bg-slate-50
+                          dark:border-slate-800
+                          dark:hover:bg-slate-800/50
+                        "
+                      >
+
+                        {/* Taxpayer */}
+
+                        <td className="px-4 py-4">
+
+                          <div className="flex items-center gap-3">
+
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white">
+                              {getInitial(record.userName)}
+                            </div>
+
+                            <div className="min-w-0">
+
+                              <p className="truncate font-semibold text-slate-900 dark:text-white">
+                                {record.userName || "Unknown"}
+                              </p>
+
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                                Tax computation #{record.id ?? "-"}
+                              </p>
+
+                            </div>
+
+                          </div>
+
+                        </td>
+
+
+                        {/* User ID */}
+
+                        <td className="px-4 py-4 font-medium">
+                          #{record.userId ?? "-"}
+                        </td>
+
+
+                        {/* PAN */}
+
+                        <td className="px-4 py-4">
+                          {record.panNumber || "-"}
+                        </td>
+
+
+                        {/* Type */}
+
+                        <td className="px-4 py-4">
+
+                          <span
+                            className={`
+                              inline-flex items-center rounded-full
+                              px-3 py-1 text-xs font-semibold
+                              ${
+                                isInstitutional
+                                  ? "bg-violet-500/10 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400"
+                                  : "bg-sky-500/10 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400"
+                              }
+                            `}
+                          >
+                            {typeLabel}
+                          </span>
+
+                        </td>
+
+
+                        {/* Financial year */}
+
+                        <td className="px-4 py-4">
+
+                          <div className="flex items-center gap-2">
+
+                            <CalendarDays className="h-4 w-4 text-slate-400" />
+
+                            <span className="font-medium">
+                              {record.financialYear || "-"}
+                            </span>
+
+                          </div>
+
+                        </td>
+
+
+                        {/* Gross income */}
+
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          {formatCurrency(record.grossIncome)}
+                        </td>
+
+
+                        {/* Taxable income */}
+
+                        <td className="px-4 py-4 whitespace-nowrap font-semibold">
+                          {formatCurrency(record.taxableIncome)}
+                        </td>
+
+
+                        {/* Rate */}
+
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          {record.taxRate ?? 0}%
+                        </td>
+
+
+                        {/* Tax */}
+
+                        <td className="px-4 py-4 whitespace-nowrap">
+
+                          <span className="font-bold text-sky-600 dark:text-sky-400">
+                            {formatCurrency(record.taxAmount)}
+                          </span>
+
+                        </td>
+
+
+                        {/* Status */}
+
+                        <td className="px-4 py-4">
+
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+
+                            Completed
+
+                          </span>
+
+                        </td>
+
+                      </tr>
+                    );
+                  })}
+
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+
+          {/* ================================================= */}
+          {/* FOOTER */}
+          {/* ================================================= */}
+
+          {!loading && filteredRecords.length > 0 && (
+            <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+
+              <span>
+                Showing {filteredRecords.length} of{" "}
+                {records.length} tax computation
+                {records.length === 1 ? "" : "s"}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                <span>
+                  Exported reports use the currently applied filters.
+                </span>
+              </div>
+
+            </div>
+          )}
+
+        </section>
+
+      </main>
+    </div>
   );
 }

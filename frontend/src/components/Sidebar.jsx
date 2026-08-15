@@ -26,7 +26,7 @@ const mainLinks = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/users", icon: Users, label: "Users" },
   { to: "/tax/compute", icon: Calculator, label: "Tax Computation" },
-  { to: "/tax/history/1", icon: History, label: "Tax History" },
+  { to: "/tax/history", icon: History, label: "Tax History" },
 ];
 
 const reportLinks = [
