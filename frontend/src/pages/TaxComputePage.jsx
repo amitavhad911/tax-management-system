@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,8 +35,16 @@ import {
   Percent,
   CheckCircle2,
   Info,
+  RotateCcw,
+  CalendarDays,
 } from "lucide-react";
 
+
+const FINANCIAL_YEARS = [
+  "2025-2026",
+  "2024-2025",
+  "2023-2024",
+];
 
 /* =========================================================
    FORM VALIDATION
@@ -263,7 +272,7 @@ export default function TaxComputePage() {
               </h1>
 
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Calculate income tax using the New Tax Regime.
+                Prepare tax computation for a financial year.
               </p>
 
             </div>
@@ -284,7 +293,7 @@ export default function TaxComputePage() {
             <div>
 
               <p className="font-semibold text-sky-900 dark:text-sky-200">
-                New Tax Regime — FY 2025-26
+                Tax rules are selected automatically
               </p>
 
               <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">
@@ -452,31 +461,27 @@ export default function TaxComputePage() {
                     control={form.control}
                     name="financialYear"
                     render={({ field }) => (
-
                       <FormItem>
-
                         <FormLabel className="text-slate-700 dark:text-slate-300">
                           Financial Year
                         </FormLabel>
-
                         <FormControl>
-
-                          <Input
-                            {...field}
-                            placeholder="2025-2026"
-                            className="bg-white dark:bg-slate-950"
-                          />
-
+                          <div className="relative">
+                            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <select
+                              {...field}
+                              className="flex h-10 w-full appearance-none rounded-md border border-slate-300 bg-white pl-10 pr-9 py-2 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                            >
+                              {FINANCIAL_YEARS.map((year) => (
+                                <option key={year} value={year}>
+                                  {year}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </FormControl>
-
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Example: 2025-2026
-                        </p>
-
                         <FormMessage />
-
                       </FormItem>
-
                     )}
                   />
 
@@ -613,6 +618,25 @@ export default function TaxComputePage() {
                   <div className="flex justify-end border-t border-slate-200 pt-5 dark:border-slate-800">
 
                     <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        form.reset({
+                          userId: "",
+                          financialYear: "2025-2026",
+                          grossIncome: "",
+                          deductions: "0",
+                          expenses: "0",
+                        });
+                        setResult(null);
+                      }}
+                      className="mr-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      Clear
+                    </Button>
+                    <Button
                       type="submit"
                       disabled={
                         isSubmitting ||
@@ -647,85 +671,70 @@ export default function TaxComputePage() {
             <CardContent className="p-6">
 
               <div className="mb-5 flex items-center gap-3">
-
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-
-                  <ReceiptText className="h-5 w-5" />
-
+                  {selectedUser?.userType === "INSTITUTIONAL" ? (
+                    <Building2 className="h-5 w-5" />
+                  ) : (
+                    <ReceiptText className="h-5 w-5" />
+                  )}
                 </div>
-
                 <div>
-
                   <h2 className="font-semibold text-slate-900 dark:text-slate-100">
-                    New Tax Regime
+                    Applicable Tax Rules
                   </h2>
-
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    FY 2025-26 / AY 2026-27
+                    {selectedUser
+                      ? `${selectedUser.userType === "INSTITUTIONAL" ? "Institutional" : "Individual"} taxpayer • FY ${form.watch("financialYear")}`
+                      : "Select a taxpayer to view applicable rules"}
                   </p>
-
                 </div>
-
               </div>
 
-
-              <div className="space-y-2 text-sm">
-
-                <SlabRow
-                  income="Up to ₹4,00,000"
-                  rate="Nil"
-                />
-
-                <SlabRow
-                  income="₹4,00,001 – ₹8,00,000"
-                  rate="5%"
-                />
-
-                <SlabRow
-                  income="₹8,00,001 – ₹12,00,000"
-                  rate="10%"
-                />
-
-                <SlabRow
-                  income="₹12,00,001 – ₹16,00,000"
-                  rate="15%"
-                />
-
-                <SlabRow
-                  income="₹16,00,001 – ₹20,00,000"
-                  rate="20%"
-                />
-
-                <SlabRow
-                  income="₹20,00,001 – ₹24,00,000"
-                  rate="25%"
-                />
-
-                <SlabRow
-                  income="Above ₹24,00,000"
-                  rate="30%"
-                />
-
-              </div>
-
-
-              <div className="mt-5 rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
-
-                <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                  Section 87A rebate is applied by the backend tax engine
-                  where applicable.
-                </p>
-
-              </div>
-
+              {!selectedUser ? (
+                <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center dark:border-slate-700 dark:bg-slate-950/50">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Select a taxpayer
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Applicable tax-rule information will appear here.
+                  </p>
+                </div>
+              ) : selectedUser.userType === "INSTITUTIONAL" ? (
+                <div className="space-y-3">
+                  <RuleRow label="Entity Type" value="Institutional" />
+                  <RuleRow label="Financial Year" value={form.watch("financialYear")} />
+                  <div className="rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
+                    <p className="text-xs font-medium leading-5 text-emerald-700 dark:text-emerald-300">
+                      Institutional tax calculation is applied by the backend tax engine. The frontend does not override the tax liability.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <RuleRow label="Entity Type" value="Individual" />
+                  <RuleRow label="Financial Year" value={form.watch("financialYear")} />
+                  <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Applicable slabs
+                  </p>
+                  <SlabRow income="Up to ₹4,00,000" rate="Nil" />
+                  <SlabRow income="₹4,00,001 – ₹8,00,000" rate="5%" />
+                  <SlabRow income="₹8,00,001 – ₹12,00,000" rate="10%" />
+                  <SlabRow income="₹12,00,001 – ₹16,00,000" rate="15%" />
+                  <SlabRow income="₹16,00,001 – ₹20,00,000" rate="20%" />
+                  <SlabRow income="₹20,00,001 – ₹24,00,000" rate="25%" />
+                  <SlabRow income="Above ₹24,00,000" rate="30%" />
+                  <div className="mt-4 rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
+                    <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                      Section 87A rebate is applied by the backend tax engine where applicable.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-4 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-
                 <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                  The final taxable income, applicable rate and tax liability
-                  are calculated by the backend.
+                  Final taxable income, applicable rate and tax liability are calculated by the backend.
                 </p>
-
               </div>
 
             </CardContent>
@@ -754,11 +763,11 @@ export default function TaxComputePage() {
                 <div>
 
                   <h2 className="font-semibold text-slate-900 dark:text-slate-100">
-                    Tax Computation Result
+                    Tax Computation Summary
                   </h2>
 
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    New Tax Regime — FY {result.financialYear}
+                    Based on applicable backend tax rules
                   </p>
 
                 </div>
@@ -780,14 +789,14 @@ export default function TaxComputePage() {
                 />
 
                 <ResultItem
-                  label="Deductions"
+                  label="Allowable Deductions"
                   value={formatCurrency(
                     result.deductions
                   )}
                 />
 
                 <ResultItem
-                  label="Expenses"
+                  label="Allowable Expenses"
                   value={formatCurrency(
                     result.expenses
                   )}
@@ -816,7 +825,7 @@ export default function TaxComputePage() {
                 />
 
                 <ResultItem
-                  label="Effective Tax Rate"
+                  label="Applicable Tax Rate"
                   value={`${result.taxRate}%`}
                   icon={
                     <Percent className="h-4 w-4" />
@@ -848,6 +857,16 @@ export default function TaxComputePage() {
       </div>
 
     </PageTransition>
+  );
+}
+
+
+function RuleRow({ label, value }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950/50">
+      <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="text-right text-sm font-semibold text-slate-900 dark:text-slate-100">{value}</span>
+    </div>
   );
 }
 

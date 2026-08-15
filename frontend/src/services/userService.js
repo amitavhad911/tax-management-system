@@ -1,6 +1,6 @@
 import api from "./api";
 
-const getAll = ({ page = 0, size = 10, search = "" } = {}) =>
+const getAll = ({ page = 0, size = 100, search = "" } = {}) =>
   api.get("/users", {
     params: {
       page,

@@ -8,6 +8,8 @@ import {
   Calculator,
   Users,
   RefreshCw,
+  UserRound,
+  Building2,
 } from "lucide-react";
 
 import { formatCurrency } from "../utils/format";
@@ -73,7 +75,9 @@ export default function ReportsPage() {
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `tax_report.${type === "pdf" ? "pdf" : "xlsx"}`;
+      a.download = `tax_report.${
+        type === "pdf" ? "pdf" : "xlsx"
+      }`;
 
       document.body.appendChild(a);
       a.click();
@@ -81,7 +85,9 @@ export default function ReportsPage() {
 
       window.URL.revokeObjectURL(url);
 
-      toast.success(`${type.toUpperCase()} report downloaded`);
+      toast.success(
+        `${type.toUpperCase()} report downloaded`
+      );
     } catch (error) {
       console.error(error);
       toast.error("Report download failed");
@@ -91,6 +97,11 @@ export default function ReportsPage() {
   return (
     <PageTransition>
       <div className="space-y-6">
+
+        {/* =========================
+            PAGE HEADER
+        ========================= */}
+
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">
@@ -110,11 +121,17 @@ export default function ReportsPage() {
             className="gap-2"
           >
             <RefreshCw
-              className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+              className={`w-4 h-4 ${
+                loading ? "animate-spin" : ""
+              }`}
             />
             Refresh
           </Button>
         </div>
+
+        {/* =========================
+            LOADING
+        ========================= */}
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -126,7 +143,12 @@ export default function ReportsPage() {
           </div>
         ) : (
           <>
+            {/* =========================
+                SUMMARY CARDS
+            ========================= */}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
@@ -138,6 +160,7 @@ export default function ReportsPage() {
                       <p className="text-sm text-muted-foreground">
                         Total Records
                       </p>
+
                       <p className="text-2xl font-bold">
                         {summary?.totalRecords ?? 0}
                       </p>
@@ -157,8 +180,11 @@ export default function ReportsPage() {
                       <p className="text-sm text-muted-foreground">
                         Total Tax Collected
                       </p>
+
                       <p className="text-2xl font-bold">
-                        {formatCurrency(summary?.totalTaxCollected || 0)}
+                        {formatCurrency(
+                          summary?.totalTaxCollected || 0
+                        )}
                       </p>
                     </div>
                   </div>
@@ -176,18 +202,27 @@ export default function ReportsPage() {
                       <p className="text-sm text-muted-foreground">
                         Average Tax
                       </p>
+
                       <p className="text-2xl font-bold">
-                        {formatCurrency(summary?.averageTaxAmount || 0)}
+                        {formatCurrency(
+                          summary?.averageTaxAmount || 0
+                        )}
                       </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+
             </div>
+
+            {/* =========================
+                TOP TAXPAYERS
+            ========================= */}
 
             <Card>
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <Trophy className="w-5 h-5 text-primary" />
@@ -201,7 +236,9 @@ export default function ReportsPage() {
 
                   <select
                     value={topN}
-                    onChange={(e) => handleTopNChange(e.target.value)}
+                    onChange={(e) =>
+                      handleTopNChange(e.target.value)
+                    }
                     className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                   >
                     <option value={5}>Top 5</option>
@@ -209,56 +246,143 @@ export default function ReportsPage() {
                     <option value={20}>Top 20</option>
                     <option value={50}>Top 50</option>
                   </select>
+
                 </div>
               </CardHeader>
 
               <CardContent>
+
                 {top.length === 0 ? (
+
                   <div className="text-center py-10 text-muted-foreground">
                     No taxpayer data available.
                   </div>
+
                 ) : (
+
                   <div className="space-y-3">
-                    {top.map((taxpayer, index) => (
-                      <div
-                        key={taxpayer.id || index}
-                        className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/40 transition-colors"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 font-bold text-primary">
-                            {taxpayer.rank || index + 1}
+
+                    {top.map((taxpayer, index) => {
+
+                      const type =
+                        taxpayer.userType ||
+                        taxpayer.taxpayerType ||
+                        "INDIVIDUAL";
+
+                      const isInstitutional =
+                        type === "INSTITUTIONAL";
+
+                      return (
+                        <div
+                          key={
+                            taxpayer.userId ||
+                            taxpayer.id ||
+                            index
+                          }
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-lg border p-4 hover:bg-muted/40 transition-colors"
+                        >
+
+                          {/* LEFT SIDE */}
+
+                          <div className="flex items-center gap-4">
+
+                            {/* RANK */}
+
+                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 font-bold text-primary shrink-0">
+                              {taxpayer.rank || index + 1}
+                            </div>
+
+                            {/* USER INFO */}
+
+                            <div>
+
+                              <p className="font-medium">
+                                {taxpayer.userName}
+                              </p>
+
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+
+                                {/* TAXPAYER TYPE */}
+
+                                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
+
+                                  {isInstitutional ? (
+                                    <Building2 className="w-3 h-3" />
+                                  ) : (
+                                    <UserRound className="w-3 h-3" />
+                                  )}
+
+                                  {isInstitutional
+                                    ? "Institutional"
+                                    : "Individual"}
+
+                                </span>
+
+                                {/* PAN */}
+
+                                {taxpayer.panNumber && (
+                                  <span className="text-xs text-muted-foreground">
+                                    PAN: {taxpayer.panNumber}
+                                  </span>
+                                )}
+
+                              </div>
+
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Taxpayer Rank #
+                                {taxpayer.rank ||
+                                  index + 1}
+                              </p>
+
+                            </div>
+
                           </div>
 
-                          <div>
-                            <p className="font-medium">
-                              {taxpayer.userName}
-                            </p>
+                          {/* TAX AMOUNT */}
+
+                          <div className="text-left sm:text-right">
 
                             <p className="text-xs text-muted-foreground">
-                              Taxpayer Rank #{taxpayer.rank || index + 1}
+                              Tax Liability
                             </p>
-                          </div>
-                        </div>
 
-                        <p className="font-bold">
-                          {formatCurrency(taxpayer.taxAmount)}
-                        </p>
-                      </div>
-                    ))}
+                            <p className="font-bold">
+                              {formatCurrency(
+                                taxpayer.taxAmount
+                              )}
+                            </p>
+
+                          </div>
+
+                        </div>
+                      );
+                    })}
+
                   </div>
                 )}
+
               </CardContent>
             </Card>
 
+            {/* =========================
+                EXPORT REPORTS
+            ========================= */}
+
             <Card>
               <CardHeader>
-                <CardTitle>Export Reports</CardTitle>
+                <CardTitle>
+                  Export Reports
+                </CardTitle>
               </CardHeader>
 
               <CardContent>
+
                 <div className="flex flex-col sm:flex-row gap-3">
+
                   <Button
-                    onClick={() => handleExport("pdf")}
+                    onClick={() =>
+                      handleExport("pdf")
+                    }
                     className="gap-2"
                   >
                     <FileDown className="w-4 h-4" />
@@ -266,18 +390,24 @@ export default function ReportsPage() {
                   </Button>
 
                   <Button
-                    onClick={() => handleExport("excel")}
+                    onClick={() =>
+                      handleExport("excel")
+                    }
                     variant="outline"
                     className="gap-2"
                   >
                     <FileDown className="w-4 h-4" />
                     Download Excel Report
                   </Button>
+
                 </div>
+
               </CardContent>
             </Card>
+
           </>
         )}
+
       </div>
     </PageTransition>
   );
