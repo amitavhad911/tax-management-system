@@ -259,7 +259,7 @@ export default function TaxComputePage() {
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--accent)] text-[var(--accent-foreground)]">
 
               <Calculator className="h-5 w-5" />
 
@@ -267,11 +267,11 @@ export default function TaxComputePage() {
 
             <div>
 
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <h1 className="text-2xl font-bold text-[var(--card-foreground)]">
                 Tax Computation
               </h1>
 
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                 Prepare tax computation for a financial year.
               </p>
 
@@ -284,19 +284,19 @@ export default function TaxComputePage() {
 
         {/* Regime Information */}
 
-        <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--accent)] p-4">
 
           <div className="flex items-start gap-3">
 
-            <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-600 dark:text-sky-400" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent-foreground)]" />
 
             <div>
 
-              <p className="font-semibold text-sky-900 dark:text-sky-200">
+              <p className="font-semibold text-[var(--accent-foreground)]">
                 Tax rules are selected automatically
               </p>
 
-              <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">
+              <p className="mt-1 text-sm text-[var(--accent-foreground)]">
                 Tax rules are selected according to the taxpayer type and
                 financial year. Individual taxpayers use applicable New Tax
                 Regime slabs, while institutional taxpayers use the configured
@@ -317,17 +317,17 @@ export default function TaxComputePage() {
 
           {/* Form */}
 
-          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 xl:col-span-2">
+          <Card className="border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] shadow-sm xl:col-span-2">
 
             <CardContent className="p-6">
 
               <div className="mb-6">
 
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                <h2 className="text-lg font-semibold text-[var(--card-foreground)]">
                   Enter Tax Details
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                   Select the taxpayer and provide the applicable income details.
                 </p>
 
@@ -351,7 +351,7 @@ export default function TaxComputePage() {
 
                       <FormItem>
 
-                        <FormLabel className="text-slate-700 dark:text-slate-300">
+                        <FormLabel className="text-[var(--foreground)]">
                           Taxpayer
                         </FormLabel>
 
@@ -360,7 +360,7 @@ export default function TaxComputePage() {
                           <select
                             {...field}
                             disabled={loadingUsers}
-                            className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                            className="flex h-10 w-full rounded-md border border-[var(--input)] bg-[var(--card)] px-3 py-2 text-sm text-[var(--card-foreground)] outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-60"
                           >
 
                             <option value="">
@@ -404,13 +404,13 @@ export default function TaxComputePage() {
 
                   {selectedUser && (
 
-                    <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--accent)]/70 p-4">
 
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                         <div className="flex min-w-0 items-center gap-3">
 
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)] text-[var(--accent-foreground)]">
 
                             {selectedUser.userType === "INSTITUTIONAL" ? (
 
@@ -426,11 +426,11 @@ export default function TaxComputePage() {
 
                           <div className="min-w-0">
 
-                            <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
+                            <p className="truncate font-semibold text-[var(--card-foreground)]">
                               {selectedUser.fullName}
                             </p>
 
-                            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--muted-foreground)]">
 
                               {selectedUser.panNumber && (
                                 <span>
@@ -451,8 +451,8 @@ export default function TaxComputePage() {
                         <span
                           className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
                             selectedUser.userType === "INSTITUTIONAL"
-                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
-                              : "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300"
+                              ? "bg-[var(--accent)] text-[var(--foreground)]  "
+                              : "bg-[var(--accent)] text-[var(--foreground)]  "
                           }`}
                         >
                           {selectedUser.userType === "INSTITUTIONAL" ? (
@@ -479,15 +479,15 @@ export default function TaxComputePage() {
                     name="financialYear"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-700 dark:text-slate-300">
+                        <FormLabel className="text-[var(--foreground)]">
                           Financial Year
                         </FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
                             <select
                               {...field}
-                              className="flex h-10 w-full appearance-none rounded-md border border-slate-300 bg-white pl-10 pr-9 py-2 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                              className="flex h-10 w-full appearance-none rounded-md border border-[var(--input)] bg-[var(--card)] pl-10 pr-9 py-2 text-sm text-[var(--card-foreground)] outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--ring)]"
                             >
                               {FINANCIAL_YEARS.map((year) => (
                                 <option key={year} value={year}>
@@ -517,7 +517,7 @@ export default function TaxComputePage() {
 
                         <FormItem>
 
-                          <FormLabel className="text-slate-700 dark:text-slate-300">
+                          <FormLabel className="text-[var(--foreground)]">
                             Gross Income
                           </FormLabel>
 
@@ -525,7 +525,7 @@ export default function TaxComputePage() {
 
                             <div className="relative">
 
-                              <IndianRupee className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                              <IndianRupee className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
 
                               <Input
                                 {...field}
@@ -533,7 +533,7 @@ export default function TaxComputePage() {
                                 min="0"
                                 step="0.01"
                                 placeholder="0.00"
-                                className="bg-white pl-9 dark:bg-slate-950"
+                                className="bg-[var(--card)] pl-9"
                               />
 
                             </div>
@@ -557,7 +557,7 @@ export default function TaxComputePage() {
 
                         <FormItem>
 
-                          <FormLabel className="text-slate-700 dark:text-slate-300">
+                          <FormLabel className="text-[var(--foreground)]">
                             Deductions
                           </FormLabel>
 
@@ -565,7 +565,7 @@ export default function TaxComputePage() {
 
                             <div className="relative">
 
-                              <ReceiptText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                              <ReceiptText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
 
                               <Input
                                 {...field}
@@ -573,7 +573,7 @@ export default function TaxComputePage() {
                                 min="0"
                                 step="0.01"
                                 placeholder="0.00"
-                                className="bg-white pl-9 dark:bg-slate-950"
+                                className="bg-[var(--card)] pl-9"
                               />
 
                             </div>
@@ -597,7 +597,7 @@ export default function TaxComputePage() {
 
                         <FormItem>
 
-                          <FormLabel className="text-slate-700 dark:text-slate-300">
+                          <FormLabel className="text-[var(--foreground)]">
                             Expenses
                           </FormLabel>
 
@@ -605,7 +605,7 @@ export default function TaxComputePage() {
 
                             <div className="relative">
 
-                              <WalletCards className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                              <WalletCards className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
 
                               <Input
                                 {...field}
@@ -613,7 +613,7 @@ export default function TaxComputePage() {
                                 min="0"
                                 step="0.01"
                                 placeholder="0.00"
-                                className="bg-white pl-9 dark:bg-slate-950"
+                                className="bg-[var(--card)] pl-9"
                               />
 
                             </div>
@@ -632,7 +632,7 @@ export default function TaxComputePage() {
 
                   {/* Submit */}
 
-                  <div className="flex justify-end border-t border-slate-200 pt-5 dark:border-slate-800">
+                  <div className="flex justify-end border-t border-[var(--border)] pt-5">
 
                     <Button
                       type="button"
@@ -648,7 +648,7 @@ export default function TaxComputePage() {
                         });
                         setResult(null);
                       }}
-                      className="mr-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                      className="mr-2 border-[var(--input)] bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--muted)]"
                     >
                       <RotateCcw className="mr-2 h-4 w-4" />
                       Clear
@@ -659,7 +659,7 @@ export default function TaxComputePage() {
                         isSubmitting ||
                         loadingUsers
                       }
-                      className="bg-sky-600 px-6 text-white hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600"
+                      className="bg-[var(--primary)] px-6 text-[var(--primary-foreground)] hover:bg-[var(--primary)]"
                     >
 
                       <Calculator className="mr-2 h-4 w-4" />
@@ -683,12 +683,12 @@ export default function TaxComputePage() {
 
           {/* Tax Slabs */}
 
-          <Card className="border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
+          <Card className="border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] shadow-sm">
 
             <CardContent className="p-6">
 
               <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent)] text-[var(--accent-foreground)]">
                   {selectedUser?.userType === "INSTITUTIONAL" ? (
                     <Building2 className="h-5 w-5" />
                   ) : (
@@ -696,10 +696,10 @@ export default function TaxComputePage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="font-semibold text-slate-900 dark:text-slate-100">
+                  <h2 className="font-semibold text-[var(--card-foreground)]">
                     Applicable Tax Rules
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-[var(--muted-foreground)]">
                     {selectedUser
                       ? `${selectedUser.userType === "INSTITUTIONAL" ? "Institutional" : "Individual"} taxpayer • FY ${form.watch("financialYear")}`
                       : "Select a taxpayer to view applicable rules"}
@@ -708,24 +708,24 @@ export default function TaxComputePage() {
               </div>
 
               {!selectedUser ? (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center dark:border-slate-700 dark:bg-slate-950/50">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <div className="rounded-xl border border-dashed border-[var(--input)] bg-[var(--muted)] p-5 text-center">
+                  <p className="text-sm font-medium text-[var(--foreground)]">
                     Select a taxpayer
                   </p>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                     Applicable tax-rule information will appear here.
                   </p>
                 </div>
               ) : selectedUser.userType === "INSTITUTIONAL" ? (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                  <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--muted)] px-3 py-2.5">
                     <div className="flex min-w-0 items-center gap-2">
-                      <Building2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                      <Building2 className="h-4 w-4 shrink-0 text-[var(--accent-foreground)]" />
+                      <span className="text-xs font-medium text-[var(--foreground)]">
                         Institutional Taxpayer
                       </span>
                     </div>
-                    <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                    <span className="shrink-0 rounded-full bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-[var(--foreground)]">
                       25% Flat Rate
                     </span>
                   </div>
@@ -735,7 +735,7 @@ export default function TaxComputePage() {
                     value={form.watch("financialYear")}
                   />
 
-                  <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
                     Institutional Tax Rules
                   </p>
 
@@ -750,8 +750,8 @@ export default function TaxComputePage() {
                     value="4% of Income Tax"
                   />
 
-                  <div className="rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
-                    <p className="text-xs font-medium leading-5 text-emerald-700 dark:text-emerald-300">
+                  <div className="rounded-lg bg-[var(--muted)] p-3">
+                    <p className="text-xs font-medium leading-5 text-[var(--foreground)]">
                       Institutional taxpayers are currently calculated using
                       the project's configured 25% institutional tax rate.
                     </p>
@@ -759,14 +759,14 @@ export default function TaxComputePage() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-3 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2.5 dark:border-violet-500/20 dark:bg-violet-500/10">
+                  <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--muted)] px-3 py-2.5">
                     <div className="flex min-w-0 items-center gap-2">
-                      <User className="h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
-                      <span className="text-xs font-medium text-violet-700 dark:text-violet-300">
+                      <User className="h-4 w-4 shrink-0 text-[var(--accent-foreground)]" />
+                      <span className="text-xs font-medium text-[var(--foreground)]">
                         Individual Taxpayer
                       </span>
                     </div>
-                    <span className="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-500/15 dark:text-violet-300">
+                    <span className="shrink-0 rounded-full bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-[var(--foreground)]">
                       New Regime
                     </span>
                   </div>
@@ -781,7 +781,7 @@ export default function TaxComputePage() {
                     value="New Tax Regime"
                   />
 
-                  <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
                     Applicable Slabs
                   </p>
 
@@ -793,8 +793,8 @@ export default function TaxComputePage() {
                   <SlabRow income="₹20,00,001 – ₹24,00,000" rate="25%" />
                   <SlabRow income="Above ₹24,00,000" rate="30%" />
 
-                  <div className="mt-4 rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
-                    <p className="text-xs font-medium leading-5 text-emerald-700 dark:text-emerald-300">
+                  <div className="mt-4 rounded-lg bg-[var(--muted)] p-3">
+                    <p className="text-xs font-medium leading-5 text-[var(--foreground)]">
                       Section 87A rebate is applied by the backend tax engine
                       where applicable.
                     </p>
@@ -802,8 +802,8 @@ export default function TaxComputePage() {
                 </div>
               )}
 
-              <div className="mt-4 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
+              <div className="mt-4 rounded-lg bg-[var(--muted)] p-3">
+                <p className="text-xs font-medium text-[var(--foreground)]">
                   Final taxable income, applicable rate and tax liability are
                   calculated by the backend.
                 </p>
@@ -820,13 +820,13 @@ export default function TaxComputePage() {
 
         {result && (
 
-          <Card className="overflow-hidden border-emerald-200 bg-white text-slate-900 shadow-sm dark:border-emerald-500/20 dark:bg-slate-900 dark:text-slate-100">
+          <Card className="overflow-hidden border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] shadow-sm">
 
-            <div className="border-b border-emerald-100 bg-emerald-50/70 px-6 py-4 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+            <div className="border-b border-[var(--border)] bg-[var(--muted)]/70 px-6 py-4">
 
               <div className="flex items-center gap-3">
 
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-foreground)]">
 
                   <CheckCircle2 className="h-5 w-5" />
 
@@ -834,14 +834,14 @@ export default function TaxComputePage() {
 
                 <div>
 
-                  <h2 className="font-semibold text-slate-900 dark:text-slate-100">
+                  <h2 className="font-semibold text-[var(--card-foreground)]">
                     {selectedUser?.userType === "INSTITUTIONAL"
                       ? "Institutional Tax"
                       : "Tax Computation"}{" "}
                     Summary
                   </h2>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-[var(--muted-foreground)]">
                     Based on applicable backend tax rules
                   </p>
 
@@ -907,13 +907,13 @@ export default function TaxComputePage() {
                   }
                 />
 
-                <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--accent)] p-4">
 
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-[var(--muted-foreground)]">
                     Total Tax Liability
                   </p>
 
-                  <p className="mt-2 text-2xl font-bold text-sky-600 dark:text-sky-400">
+                  <p className="mt-2 text-2xl font-bold text-[var(--accent-foreground)]">
                     {formatCurrency(
                       result.taxAmount
                     )}
@@ -938,9 +938,9 @@ export default function TaxComputePage() {
 
 function RuleRow({ label, value }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950/50">
-      <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
-      <span className="text-right text-sm font-semibold text-slate-900 dark:text-slate-100">{value}</span>
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--muted)] px-3 py-2">
+      <span className="text-xs text-[var(--muted-foreground)]">{label}</span>
+      <span className="text-right text-sm font-semibold text-[var(--card-foreground)]">{value}</span>
     </div>
   );
 }
@@ -954,13 +954,13 @@ function SlabRow({ income, rate }) {
 
   return (
 
-    <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950/50">
+    <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--muted)] px-3 py-2">
 
-      <span className="text-xs text-slate-600 dark:text-slate-300">
+      <span className="text-xs text-[var(--foreground)]">
         {income}
       </span>
 
-      <span className="font-semibold text-slate-900 dark:text-slate-100">
+      <span className="font-semibold text-[var(--card-foreground)]">
         {rate}
       </span>
 
@@ -986,20 +986,20 @@ function ResultItem({
     <div
       className={`rounded-xl border p-4 ${
         highlight
-          ? "border-sky-200 bg-sky-50/70 dark:border-sky-500/20 dark:bg-sky-500/10"
-          : "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/50"
+          ? "border-[var(--border)] bg-[var(--accent)]/70  "
+          : "border-[var(--border)] bg-[var(--muted)]  "
       }`}
     >
 
       <div className="flex items-center gap-2">
 
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-[var(--muted-foreground)]">
           {label}
         </p>
 
         {icon && (
 
-          <span className="text-slate-400 dark:text-slate-500">
+          <span className="text-[var(--muted-foreground)]">
             {icon}
           </span>
 
@@ -1010,8 +1010,8 @@ function ResultItem({
       <p
         className={`mt-2 text-lg font-semibold ${
           highlight
-            ? "text-sky-600 dark:text-sky-400"
-            : "text-slate-900 dark:text-slate-100"
+            ? "text-[var(--accent-foreground)] "
+            : "text-[var(--card-foreground)] "
         }`}
       >
         {value}

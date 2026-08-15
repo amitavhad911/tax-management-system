@@ -470,18 +470,19 @@ textarea::placeholder {
   opacity: 1 !important;
 }
 
-/* Dark mode - make entered text clearly visible */
+/* Dark mode - keep inputs fully theme-aware */
 .dark input,
 .dark select,
 .dark textarea {
-  color: #f8fafc !important;
-  -webkit-text-fill-color: #f8fafc !important;
-  background-color: #111827 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  background-color: var(--card) !important;
+  border-color: var(--input) !important;
 }
 
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: #94a3b8 !important;
+  color: var(--muted-foreground) !important;
   opacity: 1 !important;
 }
 
