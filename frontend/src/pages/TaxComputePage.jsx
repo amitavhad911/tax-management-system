@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,6 +40,7 @@ import {
 
 
 const FINANCIAL_YEARS = [
+  "2026-2027",
   "2025-2026",
   "2024-2025",
   "2023-2024",
@@ -297,8 +297,10 @@ export default function TaxComputePage() {
               </p>
 
               <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">
-                Tax is calculated according to the applicable New Tax Regime
-                slabs. Rebate under Section 87A is applied where applicable.
+                Tax rules are selected according to the taxpayer type and
+                financial year. Individual taxpayers use applicable New Tax
+                Regime slabs, while institutional taxpayers use the configured
+                institutional tax rate.
               </p>
 
             </div>
@@ -404,49 +406,64 @@ export default function TaxComputePage() {
 
                     <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
 
-                      <div className="flex items-start gap-3">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400">
+                        <div className="flex min-w-0 items-center gap-3">
 
-                          {selectedUser.userType === "INSTITUTIONAL" ? (
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400">
 
-                            <Building2 className="h-5 w-5" />
+                            {selectedUser.userType === "INSTITUTIONAL" ? (
 
-                          ) : (
+                              <Building2 className="h-5 w-5" />
 
-                            <User className="h-5 w-5" />
+                            ) : (
 
-                          )}
-
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">
-                            {selectedUser.fullName}
-                          </p>
-
-                          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-
-                            {selectedUser.panNumber && (
-
-                              <span>
-                                PAN: {selectedUser.panNumber}
-                              </span>
-
-                            )}
-
-                            {selectedUser.userType && (
-
-                              <span>
-                                Type: {selectedUser.userType}
-                              </span>
+                              <User className="h-5 w-5" />
 
                             )}
 
                           </div>
 
+                          <div className="min-w-0">
+
+                            <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
+                              {selectedUser.fullName}
+                            </p>
+
+                            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+
+                              {selectedUser.panNumber && (
+                                <span>
+                                  PAN: {selectedUser.panNumber}
+                                </span>
+                              )}
+
+                              <span>
+                                Taxpayer ID: {selectedUser.id}
+                              </span>
+
+                            </div>
+
+                          </div>
+
                         </div>
+
+                        <span
+                          className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                            selectedUser.userType === "INSTITUTIONAL"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                              : "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300"
+                          }`}
+                        >
+                          {selectedUser.userType === "INSTITUTIONAL" ? (
+                            <Building2 className="h-3.5 w-3.5" />
+                          ) : (
+                            <User className="h-3.5 w-3.5" />
+                          )}
+                          {selectedUser.userType === "INSTITUTIONAL"
+                            ? "Institutional"
+                            : "Individual"}
+                        </span>
 
                       </div>
 
@@ -701,21 +718,73 @@ export default function TaxComputePage() {
                 </div>
               ) : selectedUser.userType === "INSTITUTIONAL" ? (
                 <div className="space-y-3">
-                  <RuleRow label="Entity Type" value="Institutional" />
-                  <RuleRow label="Financial Year" value={form.watch("financialYear")} />
+                  <div className="flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Building2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                        Institutional Taxpayer
+                      </span>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                      25% Flat Rate
+                    </span>
+                  </div>
+
+                  <RuleRow
+                    label="Financial Year"
+                    value={form.watch("financialYear")}
+                  />
+
+                  <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Institutional Tax Rules
+                  </p>
+
+                  <RuleRow label="Tax Rate" value="25%" />
+                  <RuleRow label="Tax Type" value="Flat Tax Rate" />
+                  <RuleRow
+                    label="Calculation"
+                    value="Taxable Income × 25%"
+                  />
+                  <RuleRow
+                    label="Health & Education Cess"
+                    value="4% of Income Tax"
+                  />
+
                   <div className="rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
                     <p className="text-xs font-medium leading-5 text-emerald-700 dark:text-emerald-300">
-                      Institutional tax calculation is applied by the backend tax engine. The frontend does not override the tax liability.
+                      Institutional taxpayers are currently calculated using
+                      the project's configured 25% institutional tax rate.
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <RuleRow label="Entity Type" value="Individual" />
-                  <RuleRow label="Financial Year" value={form.watch("financialYear")} />
-                  <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                    Applicable slabs
+                  <div className="flex items-center justify-between gap-3 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2.5 dark:border-violet-500/20 dark:bg-violet-500/10">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <User className="h-4 w-4 shrink-0 text-violet-600 dark:text-violet-400" />
+                      <span className="text-xs font-medium text-violet-700 dark:text-violet-300">
+                        Individual Taxpayer
+                      </span>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-500/15 dark:text-violet-300">
+                      New Regime
+                    </span>
+                  </div>
+
+                  <RuleRow
+                    label="Financial Year"
+                    value={form.watch("financialYear")}
+                  />
+
+                  <RuleRow
+                    label="Tax Regime"
+                    value="New Tax Regime"
+                  />
+
+                  <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Applicable Slabs
                   </p>
+
                   <SlabRow income="Up to ₹4,00,000" rate="Nil" />
                   <SlabRow income="₹4,00,001 – ₹8,00,000" rate="5%" />
                   <SlabRow income="₹8,00,001 – ₹12,00,000" rate="10%" />
@@ -723,9 +792,11 @@ export default function TaxComputePage() {
                   <SlabRow income="₹16,00,001 – ₹20,00,000" rate="20%" />
                   <SlabRow income="₹20,00,001 – ₹24,00,000" rate="25%" />
                   <SlabRow income="Above ₹24,00,000" rate="30%" />
+
                   <div className="mt-4 rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
-                    <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                      Section 87A rebate is applied by the backend tax engine where applicable.
+                    <p className="text-xs font-medium leading-5 text-emerald-700 dark:text-emerald-300">
+                      Section 87A rebate is applied by the backend tax engine
+                      where applicable.
                     </p>
                   </div>
                 </div>
@@ -733,7 +804,8 @@ export default function TaxComputePage() {
 
               <div className="mt-4 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
                 <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                  Final taxable income, applicable rate and tax liability are calculated by the backend.
+                  Final taxable income, applicable rate and tax liability are
+                  calculated by the backend.
                 </p>
               </div>
 
@@ -763,7 +835,10 @@ export default function TaxComputePage() {
                 <div>
 
                   <h2 className="font-semibold text-slate-900 dark:text-slate-100">
-                    Tax Computation Summary
+                    {selectedUser?.userType === "INSTITUTIONAL"
+                      ? "Institutional Tax"
+                      : "Tax Computation"}{" "}
+                    Summary
                   </h2>
 
                   <p className="text-xs text-slate-500 dark:text-slate-400">
