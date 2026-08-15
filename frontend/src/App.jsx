@@ -54,6 +54,14 @@ function AnimatedRoutes() {
 
           {/* Tax */}
           <Route path="/tax/compute" element={<TaxComputePage />} />
+
+          {/* Global Tax History */}
+          <Route
+            path="/tax/history"
+            element={<TaxHistoryPage />}
+          />
+
+          {/* Existing Taxpayer-Specific Tax History */}
           <Route
             path="/tax/history/:userId"
             element={<TaxHistoryPage />}
