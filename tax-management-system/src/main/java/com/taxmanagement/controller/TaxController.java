@@ -20,33 +20,97 @@ public class TaxController {
     private final TaxService taxService;
 
     @PostMapping("/compute")
-    public ResponseEntity<ApiResponse<TaxRecordResponseDTO>> compute(@Valid @RequestBody TaxComputeRequestDTO request) {
+    public ResponseEntity<ApiResponse<TaxRecordResponseDTO>> compute(
+            @Valid @RequestBody TaxComputeRequestDTO request) {
+
         TaxRecordResponseDTO result = taxService.computeAndSave(request);
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.<TaxRecordResponseDTO>builder().success(true).message("Tax computed").data(result).build());
+                .body(
+                        ApiResponse.<TaxRecordResponseDTO>builder()
+                                .success(true)
+                                .message("Tax computed")
+                                .data(result)
+                                .build()
+                );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<TaxRecordResponseDTO>> getById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<TaxRecordResponseDTO>> getById(
+            @PathVariable Long id) {
+
         return ResponseEntity.ok(
-                ApiResponse.<TaxRecordResponseDTO>builder().success(true).data(taxService.getTaxRecordById(id)).build());
+                ApiResponse.<TaxRecordResponseDTO>builder()
+                        .success(true)
+                        .data(taxService.getTaxRecordById(id))
+                        .build()
+        );
     }
 
-    @GetMapping("/history/{userId}")
-    public ResponseEntity<ApiResponse<List<TaxRecordResponseDTO>>> getHistory(@PathVariable Long userId) {
+    /*
+     * =========================================================
+     * ALL COMPLETED TAX COMPUTATIONS
+     * =========================================================
+     *
+     * Returns tax history for all taxpayers who have
+     * at least one completed tax computation.
+     *
+     * Existing /history/{userId} endpoint remains unchanged.
+     */
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse<List<TaxRecordResponseDTO>>> getAllHistory() {
+
         return ResponseEntity.ok(
-                ApiResponse.<List<TaxRecordResponseDTO>>builder().success(true).data(taxService.getTaxHistoryByUser(userId)).build());
+                ApiResponse.<List<TaxRecordResponseDTO>>builder()
+                        .success(true)
+                        .data(taxService.getAllTaxHistory())
+                        .build()
+        );
+    }
+
+    /*
+     * =========================================================
+     * TAX HISTORY FOR ONE USER
+     * =========================================================
+     *
+     * Existing endpoint preserved for compatibility.
+     */
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<ApiResponse<List<TaxRecordResponseDTO>>> getHistory(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<TaxRecordResponseDTO>>builder()
+                        .success(true)
+                        .data(taxService.getTaxHistoryByUser(userId))
+                        .build()
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<TaxRecordResponseDTO>> update(@PathVariable Long id, @Valid @RequestBody TaxComputeRequestDTO request) {
+    public ResponseEntity<ApiResponse<TaxRecordResponseDTO>> update(
+            @PathVariable Long id,
+            @Valid @RequestBody TaxComputeRequestDTO request) {
+
         return ResponseEntity.ok(
-                ApiResponse.<TaxRecordResponseDTO>builder().success(true).data(taxService.updateTaxRecord(id, request)).build());
+                ApiResponse.<TaxRecordResponseDTO>builder()
+                        .success(true)
+                        .data(taxService.updateTaxRecord(id, request))
+                        .build()
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long id) {
+
         taxService.deleteTaxRecord(id);
-        return ResponseEntity.ok(ApiResponse.<Void>builder().success(true).message("Tax record deleted").build());
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message("Tax record deleted")
+                        .build()
+        );
     }
 }

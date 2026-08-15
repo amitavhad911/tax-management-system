@@ -25,6 +25,11 @@ public class TaxServiceImpl implements TaxService {
     private final TaxRecordRepository taxRecordRepository;
     private final UserRepository userRepository;
 
+
+    // =========================================================
+    // COMPUTE AND SAVE
+    // =========================================================
+
     @Override
     public TaxRecordResponseDTO computeAndSave(
             TaxComputeRequestDTO request) {
@@ -63,11 +68,8 @@ public class TaxServiceImpl implements TaxService {
                         : BigDecimal.ZERO;
 
         /*
-         * Tax calculation is delegated to TaxCalculator.
-         *
-         * Financial year and user type are passed dynamically.
-         * Therefore, TaxServiceImpl does NOT hardcode
-         * 2025-2026 or any particular financial year.
+         * Tax calculation remains delegated to TaxCalculator.
+         * No calculation logic is duplicated here.
          */
         TaxCalculator.TaxResult result =
                 TaxCalculator.calculate(
@@ -96,6 +98,11 @@ public class TaxServiceImpl implements TaxService {
         return mapToDTO(record);
     }
 
+
+    // =========================================================
+    // GET TAX RECORD BY ID
+    // =========================================================
+
     @Override
     @Transactional(readOnly = true)
     public TaxRecordResponseDTO getTaxRecordById(Long id) {
@@ -111,6 +118,34 @@ public class TaxServiceImpl implements TaxService {
 
         return mapToDTO(record);
     }
+
+
+    // =========================================================
+    // GET ALL COMPLETED TAX HISTORY
+    // =========================================================
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaxRecordResponseDTO> getAllTaxHistory() {
+
+        /*
+         * A TaxRecord exists only after a tax computation
+         * has been successfully calculated and saved.
+         *
+         * Therefore this returns only completed computations,
+         * not all registered users.
+         */
+        return taxRecordRepository
+                .findAllTaxHistory()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    // =========================================================
+    // GET TAX HISTORY BY USER
+    // =========================================================
 
     @Override
     @Transactional(readOnly = true)
@@ -130,6 +165,11 @@ public class TaxServiceImpl implements TaxService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+
+    // =========================================================
+    // UPDATE TAX RECORD
+    // =========================================================
 
     @Override
     public TaxRecordResponseDTO updateTaxRecord(
@@ -177,8 +217,7 @@ public class TaxServiceImpl implements TaxService {
                         : BigDecimal.ZERO;
 
         /*
-         * Recalculate tax whenever income,
-         * deductions, expenses or financial year changes.
+         * Existing TaxCalculator remains the source of truth.
          */
         TaxCalculator.TaxResult result =
                 TaxCalculator.calculate(
@@ -206,6 +245,11 @@ public class TaxServiceImpl implements TaxService {
         return mapToDTO(updated);
     }
 
+
+    // =========================================================
+    // DELETE TAX RECORD
+    // =========================================================
+
     @Override
     public void deleteTaxRecord(Long id) {
 
@@ -220,6 +264,11 @@ public class TaxServiceImpl implements TaxService {
 
         taxRecordRepository.delete(record);
     }
+
+
+    // =========================================================
+    // MAP ENTITY -> DTO
+    // =========================================================
 
     private TaxRecordResponseDTO mapToDTO(
             TaxRecord record) {
@@ -239,9 +288,13 @@ public class TaxServiceImpl implements TaxService {
                 .taxAmount(record.getTaxAmount())
                 .createdDate(record.getCreatedDate())
                 .updatedDate(record.getUpdatedDate())
+
+                // Taxpayer information
                 .userId(user.getId())
                 .userName(user.getFullName())
                 .panNumber(user.getPanNumber())
+                .userType(user.getUserType())
+
                 .build();
     }
 }

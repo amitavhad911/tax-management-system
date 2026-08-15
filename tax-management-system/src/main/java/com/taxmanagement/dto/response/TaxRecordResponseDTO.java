@@ -1,5 +1,6 @@
 package com.taxmanagement.dto.response;
 
+import com.taxmanagement.entity.User;
 import lombok.Builder;
 import lombok.Data;
 
@@ -38,9 +39,13 @@ public class TaxRecordResponseDTO {
 
     private LocalDateTime updatedDate;
 
+    // Taxpayer information
     private Long userId;
 
     private String userName;
 
     private String panNumber;
+
+    // Individual / Institutional
+    private User.UserType userType;
 }

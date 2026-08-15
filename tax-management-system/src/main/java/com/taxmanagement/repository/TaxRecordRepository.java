@@ -29,6 +29,28 @@ public interface TaxRecordRepository
 
 
     // =========================================================
+    // ALL COMPLETED TAX HISTORY
+    // =========================================================
+    /*
+     * Every TaxRecord represents a completed/saved
+     * tax computation.
+     *
+     * Fetch the associated User so the service can return:
+     * - userId
+     * - userName
+     * - PAN
+     * - userType
+     */
+    @Query("""
+            SELECT t
+            FROM TaxRecord t
+            JOIN FETCH t.user
+            ORDER BY t.financialYear DESC, t.createdDate DESC
+            """)
+    List<TaxRecord> findAllTaxHistory();
+
+
+    // =========================================================
     // TOTAL TAX - ALL FINANCIAL YEARS
     // =========================================================
 
