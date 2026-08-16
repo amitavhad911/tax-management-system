@@ -40,7 +40,7 @@ public class DataInitializer {
                     );
 
             admin.setPassword(
-                    passwordEncoder.encode("admin123")
+                    passwordEncoder.encode("Admin321")
             );
 
             adminRepo.save(admin);

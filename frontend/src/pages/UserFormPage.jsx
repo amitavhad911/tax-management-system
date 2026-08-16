@@ -100,6 +100,9 @@ export default function UserFormPage() {
 
   const { isSubmitting } = form.formState;
 
+  const userType = form.watch("userType");
+  const isInstitutional = userType === "INSTITUTIONAL";
+
   useEffect(() => {
     if (!isEdit) return;
 
@@ -324,11 +327,15 @@ export default function UserFormPage() {
               <section>
                 <div className="mb-4">
                   <h3 className="font-semibold text-foreground">
-                    Personal Information
+                    {isInstitutional
+                      ? "Organization Information"
+                      : "Personal Information"}
                   </h3>
 
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Basic identification and contact information.
+                    {isInstitutional
+                      ? "Basic organization identification and contact information."
+                      : "Basic identification and contact information."}
                   </p>
                 </div>
 
@@ -340,7 +347,11 @@ export default function UserFormPage() {
                     name="fullName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>
+                          {isInstitutional
+                            ? "Organization / Company Name"
+                            : "Full Name"}
+                        </FormLabel>
 
                         <FormControl>
                           <div className="relative">
@@ -349,7 +360,11 @@ export default function UserFormPage() {
                             <Input
                               {...field}
                               className="h-11 pl-9"
-                              placeholder="Enter full name"
+                              placeholder={
+                                isInstitutional
+                                  ? "Enter organization or company name"
+                                  : "Enter full name"
+                              }
                             />
                           </div>
                         </FormControl>
@@ -428,7 +443,11 @@ export default function UserFormPage() {
                               {...field}
                               maxLength={10}
                               className="h-11 pl-9 uppercase"
-                              placeholder="ABCDE1234F"
+                              placeholder={
+                                isInstitutional
+                                  ? "Enter organization PAN"
+                                  : "ABCDE1234F"
+                              }
                               onChange={(e) =>
                                 field.onChange(
                                   e.target.value.toUpperCase()
@@ -458,7 +477,11 @@ export default function UserFormPage() {
                             <Input
                               {...field}
                               className="h-11 pl-9"
-                              placeholder="Enter address"
+                              placeholder={
+                                isInstitutional
+                                  ? "Enter registered office address"
+                                  : "Enter address"
+                              }
                             />
                           </div>
                         </FormControl>

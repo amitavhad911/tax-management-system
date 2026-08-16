@@ -19,6 +19,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const EXPORT_FORMATS = [
+  { value: "json", label: "JSON" },
+  { value: "csv", label: "CSV" },
+  { value: "xlsx", label: "Excel" },
+  { value: "pdf", label: "PDF" },
+];
+
+const RESTORE_FORMATS = ["json", "csv", "xlsx"];
+
 export default function BackupPage() {
   const [format, setFormat] = useState("json");
   const [file, setFile] = useState(null);
@@ -28,16 +37,28 @@ export default function BackupPage() {
 
   const fileInputRef = useRef(null);
 
+  // --------------------------------------------------
+  // EXPORT
+  // --------------------------------------------------
+
   const handleExport = async () => {
     setExporting(true);
 
     try {
       const res = await backupService.exportData(format);
 
-      const blob = new Blob([res.data]);
+      const contentType =
+        res.headers?.["content-type"] ||
+        "application/octet-stream";
+
+      const blob = new Blob([res.data], {
+        type: contentType,
+      });
+
       const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement("a");
+
       link.href = url;
       link.download = `tax-management-backup.${format}`;
 
@@ -50,15 +71,84 @@ export default function BackupPage() {
       toast.success("Backup saved successfully");
     } catch (error) {
       console.error("Backup export failed:", error);
-      toast.error("Backup export failed");
+
+      toast.error(
+        error?.response?.data?.message ||
+          "Backup export failed"
+      );
     } finally {
       setExporting(false);
     }
   };
 
+  // --------------------------------------------------
+  // FILE VALIDATION
+  // --------------------------------------------------
+
+  const getFileExtension = (filename) => {
+    if (!filename || !filename.includes(".")) {
+      return "";
+    }
+
+    return filename
+      .split(".")
+      .pop()
+      .toLowerCase();
+  };
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files?.[0] || null;
+
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+
+    const extension = getFileExtension(selectedFile.name);
+
+    /*
+     * PDF is intentionally NOT accepted for database restore.
+     * It is an export/report format only.
+     */
+    if (!RESTORE_FORMATS.includes(extension)) {
+      setFile(null);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      if (extension === "pdf") {
+        toast.error(
+          "PDF backups are export-only and cannot be used to restore database data."
+        );
+      } else {
+        toast.error(
+          "Unsupported backup file. Please select CSV, Excel or JSON."
+        );
+      }
+
+      return;
+    }
+
+    setFile(selectedFile);
+  };
+
+  // --------------------------------------------------
+  // RESTORE
+  // --------------------------------------------------
+
   const handleRestore = async () => {
     if (!file) {
       toast.error("Please select a backup file first");
+      return;
+    }
+
+    const extension = getFileExtension(file.name);
+
+    if (!RESTORE_FORMATS.includes(extension)) {
+      toast.error(
+        "Unsupported backup file. Please select CSV, Excel or JSON."
+      );
       return;
     }
 
@@ -68,7 +158,13 @@ export default function BackupPage() {
       const formData = new FormData();
 
       formData.append("file", file);
-      formData.append("format", format);
+
+      /*
+       * IMPORTANT:
+       * Restore format is detected from the selected file,
+       * not from the Backup Format export dropdown.
+       */
+      formData.append("format", extension);
 
       await backupService.restore(formData);
 
@@ -146,9 +242,14 @@ export default function BackupPage() {
                   disabled={exporting || restoring}
                   className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
                 >
-                  <option value="json">JSON</option>
-                  <option value="csv">CSV</option>
-                  <option value="xlsx">Excel</option>
+                  {EXPORT_FORMATS.map((item) => (
+                    <option
+                      key={item.value}
+                      value={item.value}
+                    >
+                      {item.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -190,11 +291,14 @@ export default function BackupPage() {
                   type="file"
                   accept=".json,.csv,.xlsx"
                   disabled={restoring}
-                  onChange={(e) =>
-                    setFile(e.target.files?.[0] || null)
-                  }
+                  onChange={handleFileChange}
                   className="w-full rounded-md border p-2 text-sm bg-background"
                 />
+
+                <p className="text-xs text-muted-foreground mt-2">
+                  Accepted restore formats: CSV, Excel and JSON.
+                  PDF backups are export-only.
+                </p>
 
                 {file && (
                   <div className="mt-3 rounded-md bg-muted/50 border p-3">
