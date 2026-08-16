@@ -15,31 +15,55 @@ public class AiAssistantController {
 
     private final AiAssistantService aiAssistantService;
 
+
     @PostMapping("/explain-tax/{taxRecordId}")
-    public ResponseEntity<ApiResponse<AiExplainResponseDTO>> explainTax(@PathVariable Long taxRecordId) {
+    public ResponseEntity<ApiResponse<AiExplainResponseDTO>> explainTax(
+            @PathVariable Long taxRecordId) {
+
         return ResponseEntity.ok(
-                ApiResponse.<AiExplainResponseDTO>builder().success(true)
-                        .data(aiAssistantService.explainTax(taxRecordId)).build());
+                ApiResponse.<AiExplainResponseDTO>builder()
+                        .success(true)
+                        .data(aiAssistantService.explainTax(taxRecordId))
+                        .build()
+        );
     }
+
 
     @PostMapping("/suggest-deductions")
-    public ResponseEntity<ApiResponse<AiSuggestionResponseDTO>> suggestDeductions() {
+    public ResponseEntity<ApiResponse<AiSuggestionResponseDTO>> suggestDeductions(
+            @RequestParam Long userId) {
+
         return ResponseEntity.ok(
-                ApiResponse.<AiSuggestionResponseDTO>builder().success(true)
-                        .data(aiAssistantService.suggestDeductions()).build());
+                ApiResponse.<AiSuggestionResponseDTO>builder()
+                        .success(true)
+                        .data(aiAssistantService.suggestDeductions(userId))
+                        .build()
+        );
     }
+
 
     @PostMapping("/ask")
-    public ResponseEntity<ApiResponse<AiAskResponseDTO>> ask(@Valid @RequestBody AiAskRequestDTO request) {
+    public ResponseEntity<ApiResponse<AiAskResponseDTO>> ask(
+            @Valid @RequestBody AiAskRequestDTO request) {
+
         return ResponseEntity.ok(
-                ApiResponse.<AiAskResponseDTO>builder().success(true)
-                        .data(aiAssistantService.askQuestion(request)).build());
+                ApiResponse.<AiAskResponseDTO>builder()
+                        .success(true)
+                        .data(aiAssistantService.askQuestion(request))
+                        .build()
+        );
     }
 
+
     @PostMapping("/summarize/{userId}")
-    public ResponseEntity<ApiResponse<AiSummaryResponseDTO>> summarize(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<AiSummaryResponseDTO>> summarize(
+            @PathVariable Long userId) {
+
         return ResponseEntity.ok(
-                ApiResponse.<AiSummaryResponseDTO>builder().success(true)
-                        .data(aiAssistantService.summarizeUserHistory(userId)).build());
+                ApiResponse.<AiSummaryResponseDTO>builder()
+                        .success(true)
+                        .data(aiAssistantService.summarizeUserHistory(userId))
+                        .build()
+        );
     }
 }

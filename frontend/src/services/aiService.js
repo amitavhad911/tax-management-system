@@ -1,50 +1,47 @@
 import api from "./api";
 
 // --------------------------------------------------
-// Ask AI
-// --------------------------------------------------
-// context is optional.
-// Existing callers using ask(question) continue to work.
+// Ask AI using selected taxpayer context
 // --------------------------------------------------
 
-const ask = (question, context = "") => {
-  const cleanQuestion = question?.trim();
-
-  const contextualQuestion = context?.trim()
-    ? `${context.trim()}
-
-User question:
-${cleanQuestion}`
-    : cleanQuestion;
-
+const ask = (question, userId) => {
   return api.post("/ai/ask", {
-    question: contextualQuestion,
+    question: question.trim(),
+    userId,
   });
 };
 
+
 // --------------------------------------------------
-// Suggest Deductions
+// Suggest deductions for selected taxpayer
 // --------------------------------------------------
 
-const suggestDeductions = () => {
-  return api.post("/ai/suggest-deductions");
+const suggestDeductions = (userId) => {
+  return api.post("/ai/suggest-deductions", null, {
+    params: {
+      userId,
+    },
+  });
 };
 
+
 // --------------------------------------------------
-// Summarize Taxpayer
+// Summarize taxpayer history
 // --------------------------------------------------
 
 const summarize = (userId) => {
   return api.post(`/ai/summarize/${userId}`);
 };
 
+
 // --------------------------------------------------
-// Explain Tax Record
+// Explain specific tax computation
 // --------------------------------------------------
 
 const explainTax = (taxRecordId) => {
   return api.post(`/ai/explain-tax/${taxRecordId}`);
 };
+
 
 // --------------------------------------------------
 // Export
