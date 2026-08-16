@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import userService from "../services/userService";
 import { toast } from "react-hot-toast";
 
@@ -44,12 +44,21 @@ import PageTransition from "../components/PageTransition";
 const USERS_PER_PAGE = 5;
 
 export default function UsersPage() {
+  const [searchParams] = useSearchParams();
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [taxpayerType, setTaxpayerType] = useState("ALL");
+
+  const initialType = searchParams.get("type");
+  const validInitialType =
+    initialType === "INDIVIDUAL" || initialType === "INSTITUTIONAL"
+      ? initialType
+      : "ALL";
+
+  const [taxpayerType, setTaxpayerType] = useState(validInitialType);
   const [currentPage, setCurrentPage] = useState(1);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -57,6 +66,18 @@ export default function UsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const type = searchParams.get("type");
+
+    const nextType =
+      type === "INDIVIDUAL" || type === "INSTITUTIONAL"
+        ? type
+        : "ALL";
+
+    setTaxpayerType(nextType);
+    setCurrentPage(1);
+  }, [searchParams]);
 
   /*
    * IMPORTANT:
@@ -650,7 +671,7 @@ export default function UsersPage() {
                               </Button>
                             </Link>
 
-                            <Link to={`/tax/history/${user.id}`}>
+                            <Link to={`/tax/history?userId=${user.id}`}>
                               <Button
                                 variant="ghost"
                                 size="icon"

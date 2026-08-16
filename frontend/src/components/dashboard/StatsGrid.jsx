@@ -102,7 +102,7 @@ export default function StatsGrid({ dashboard, loading }) {
         value={data.individualCount ?? 0}
         icon={UserRound}
         type="individuals"
-        route="/users"
+        route="/users?type=INDIVIDUAL"
         loading={loading}
       />
 
@@ -111,7 +111,7 @@ export default function StatsGrid({ dashboard, loading }) {
         value={data.institutionalCount ?? 0}
         icon={Building2}
         type="institutional"
-        route="/users"
+        route="/users?type=INSTITUTIONAL"
         loading={loading}
       />
 
@@ -130,7 +130,7 @@ export default function StatsGrid({ dashboard, loading }) {
         type="top"
         route={
           data.highestTaxpayer
-            ? `/tax/history/${data.highestTaxpayer.userId}`
+            ? `/tax/history?userId=${data.highestTaxpayer.userId}`
             : undefined
         }
         loading={loading}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import taxService from "../services/taxService";
 import { formatCurrency } from "../utils/format";
 import { toast } from "react-hot-toast";
@@ -83,6 +83,7 @@ const typeBadgeClass = (type) =>
 
 export default function TaxHistoryPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +106,15 @@ export default function TaxHistoryPage() {
     try {
       const res = await taxService.getAllHistory();
       const data = Array.isArray(res?.data?.data) ? res.data.data : [];
-      setRecords(data);
+
+      // Keep newest computations first.
+      const sortedData = [...data].sort(
+        (a, b) =>
+          new Date(b?.createdDate || b?.updatedDate || 0) -
+          new Date(a?.createdDate || a?.updatedDate || 0)
+      );
+
+      setRecords(sortedData);
     } catch (error) {
       console.error("Failed to load global tax history:", error);
       setRecords([]);
@@ -148,12 +157,17 @@ export default function TaxHistoryPage() {
       const matchesType =
         taxpayerType === "ALL" || type === taxpayerType;
 
+      const selectedUserId = searchParams.get("userId");
+      const matchesUser =
+        !selectedUserId ||
+        String(getTaxpayerId(record)) === String(selectedUserId);
+
       const matchesYear =
         financialYear === "ALL" || year === financialYear;
 
-      return matchesSearch && matchesType && matchesYear;
+      return matchesSearch && matchesType && matchesYear && matchesUser;
     });
-  }, [records, search, taxpayerType, financialYear]);
+  }, [records, search, taxpayerType, financialYear, searchParams]);
 
   const uniqueTaxpayers = useMemo(
     () =>
@@ -191,6 +205,22 @@ export default function TaxHistoryPage() {
       setPage(totalPages);
     }
   }, [page, totalPages]);
+
+  useEffect(() => {
+    const recordId = searchParams.get("recordId");
+
+    if (!recordId || !records.length) {
+      return;
+    }
+
+    const record = records.find(
+      (item) => String(item.id) === String(recordId)
+    );
+
+    if (record) {
+      setSelectedRecord(record);
+    }
+  }, [records, searchParams]);
 
   const resetFilters = () => {
     setSearch("");
@@ -426,6 +456,12 @@ export default function TaxHistoryPage() {
 
           <CardContent className="p-4 sm:p-5">
             {/* FILTERS */}
+            {searchParams.get("userId") && (
+              <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300">
+                Showing tax computations for Taxpayer ID {searchParams.get("userId")}
+              </div>
+            )}
+
             <div className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(280px,1fr)_190px_190px_auto]">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />

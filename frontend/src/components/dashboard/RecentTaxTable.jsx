@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import taxService from "../../services/taxService";
 import { formatCurrency } from "../../utils/format";
 import { format } from "date-fns";
@@ -33,16 +33,31 @@ import {
 import { motion } from "framer-motion";
 
 export default function RecentTaxTable() {
+  const navigate = useNavigate();
+
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     taxService
-      .getHistory(1)
+      .getAllHistory()
       .then((res) => {
-        setRecords(res.data?.data?.slice(0, 5) || []);
+        const allRecords = Array.isArray(res?.data?.data)
+          ? res.data.data
+          : [];
+
+        const sortedRecords = [...allRecords]
+          .sort(
+            (a, b) =>
+              new Date(b?.createdDate || b?.updatedDate || 0) -
+              new Date(a?.createdDate || a?.updatedDate || 0)
+          )
+          .slice(0, 3);
+
+        setRecords(sortedRecords);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("Failed to load recent tax computations:", error);
         setRecords([]);
       })
       .finally(() => {
@@ -75,7 +90,7 @@ export default function RecentTaxTable() {
             className="text-[var(--foreground)] hover:bg-[var(--muted)]"
           >
             <Link
-              to="/tax/history/1"
+              to="/tax/history"
               className="flex items-center gap-1 text-sm"
             >
               View All
@@ -117,7 +132,7 @@ export default function RecentTaxTable() {
 
               <TableBody>
                 {loading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
+                  Array.from({ length: 3 }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell>
                         <Skeleton className="h-4 w-[110px]" />
@@ -169,11 +184,17 @@ export default function RecentTaxTable() {
                   records.map((r) => (
                     <TableRow
                       key={r.id}
-                      className="hover:bg-[var(--muted)]"
+                      onClick={() =>
+                        navigate(`/tax/history?recordId=${r.id}`)
+                      }
+                      className="cursor-pointer hover:bg-[var(--muted)]"
+                      title="View computation details"
                     >
                       <TableCell className="text-sm font-medium text-[var(--foreground)]">
                         {r.userName ||
                           r.user?.fullName ||
+                          r.fullName ||
+                          r.taxpayerName ||
                           "N/A"}
                       </TableCell>
 
